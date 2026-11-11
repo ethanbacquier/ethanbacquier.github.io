@@ -97,7 +97,7 @@ Tout le texte modifiable sans toucher au code.
 
 | Fichier | Contenu |
 |---|---|
-| `profile.json` | identité, liens, CV, textes « À propos », « Côté terrain », cartes « Ce que je fais » |
+| `profile.json` | identité, liens, CV, textes « À propos », « Hors des cours », cartes « Ce que je fais » |
 | `skills.json` | touches du clavier |
 | `projects.json` | bulles projets (dont `tagline`, l'accroche de la fiche) |
 | `timeline.json` | parcours |
@@ -120,7 +120,7 @@ Tout le texte modifiable sans toucher au code.
 - LinkedIn : https://www.linkedin.com/in/ethan-bacquier
 - TryHackMe : https://tryhackme.com/p/.Tatoune
 - Hack The Box : https://app.hackthebox.com/users/2165775
-- Instagram : https://www.instagram.com/ethan.bcqr/ → **uniquement** dans le bloc « Côté terrain » (ex-« Hors écran », renommé le 11/11)
+- Instagram : https://www.instagram.com/ethan.bcqr/ → **uniquement** dans le bloc « Hors des cours » (ex-« Hors écran », renommé le 11/11)
 - Téléphone : **aucun**
 - CV : `public/cv/ethan-bacquier-cv.pdf`, champ `cv.available: false` → bouton désactivé « CV · bientôt dispo » (`aria-disabled="true"`, pas de lien). Passer à `true` suffit à l'activer.
 - Photo volley : champ `offscreen.photo` (`null` → carte texte seule).
@@ -296,7 +296,7 @@ Structure suggérée :
 ### Matières (verre dépoli, refonte du 30/10)
 - Jetons `--glass` (cartes), `--glass-strong` (surfaces flottantes), `--glass-blur`, `--glass-edge`, `--glass-shine` (arête claire), `--float-shadow`, `--radius: 22px`.
 - **Surfaces flottantes** en verre : en-tête (avec un fondu sous la barre au lieu d'un trait), menu mobile, fiche projet, toast, onglet CV, info-bulles, modale des crédits (fond de page assombri et flouté derrière).
-- **Cartes du contenu** en verre (`.frame` / `.glass-card`) : « Ce que je fais », tuiles d'entraînement, calendrier, « Côté terrain », fiches projets, contact, alternance. Le cadre pointillé à équerres a disparu.
+- **Cartes du contenu** en verre (`.frame` / `.glass-card`) : « Ce que je fais », tuiles d'entraînement, calendrier, « Hors des cours », fiches projets, contact, alternance. Le cadre pointillé à équerres a disparu.
 - `prefers-reduced-transparency` et `prefers-contrast: more` : surfaces pleines, sans flou (contours nets en contraste élevé).
 
 ### Curseur
@@ -374,7 +374,7 @@ Le contenu du hero glisse vers l'extérieur en fondu (scrub). Avatar à gauche, 
 - Label « À PROPOS »
 - Paragraphe (~20 px, passe de `--muted` à `--text` mot à mot au défilement), raccourci le 11/11 à la demande d'Ethan (« plus simple et bref ») :
   > Étudiant en 2e année de cybersécurité à Ynov Lyon, j'apprends en pratiquant : labs sur TryHackMe et Hack The Box, projets en Go, en Python et pour le web. Je cherche un stage, puis une alternance pour ma 3e année.
-- Bloc « Côté terrain » (titre « Hors écran » jusqu'au 11/11, Ethan le trouvait bizarre ; même style d'étiquette) : `volley.webp` (4:5, grayscale → couleur au survol) +
+- Bloc « Hors des cours » (titre « Hors écran » jusqu'au 11/11, Ethan le trouvait bizarre ; même style d'étiquette) : `volley.webp` (4:5, grayscale → couleur au survol) +
   > Libéro en Nationale 3 au Volley Ball Villefranche Beaujolais (VBVB). Lire le jeu, rester calme, jouer pour l'équipe : au fond, c'est le même métier.
 
   + lien Instagram discret (icône Solar + « @ethan.bcqr »). Sans photo : carte texte seule, sans bloc vide.

@@ -50,7 +50,7 @@ Tout le texte vit dans `src/data/`. Règle commune : une valeur à `null` est ma
 
 | Fichier | Ce qu'il contient |
 |---|---|
-| `profile.json` | nom, statut, e-mail, Discord, liens, texte « À propos », bloc « Côté terrain », cartes « Ce que je fais », CV |
+| `profile.json` | nom, statut, e-mail, Discord, liens, texte « À propos », bloc « Hors des cours », cartes « Ce que je fais », CV |
 | `skills.json` | les 24 touches du clavier (si tu en ajoutes une, ajoute aussi une place dans `ROWS` de `KeyboardScene.tsx`) : nom, logo, monogramme, lettre du raccourci, phrase |
 | `projects.json` | les bulles projets |
 | `timeline.json` | le parcours |
