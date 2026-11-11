@@ -112,7 +112,7 @@ Tout le texte modifiable sans toucher au code.
 - Statut : **Étudiant en B2 Cybersécurité · Ynov Campus Lyon (2026–2027)** (`status`, utilisé dans `llms.txt`) ; version courte du hero `heroStatus` : « B2 · Ynov Campus Lyon · 2026–27 » (évite de répéter « Étudiant en cybersécurité » juste sous le mot rotatif)
 - Badge du hero : « Stage 170 h dès nov. 2026 · Alternance B3 en 2027 » (affiché sur 2 lignes, coupé sur « · »)
 - Recherche : stage de 170 h cette année **et** alternance en B3 (rentrée 2027, rythme **1 semaine à l'école / 2 semaines en entreprise**). Les recruteurs s'intéressent souvent plus aux alternants : l'alternance est mise en avant (badge, Disponibilités, timeline, formulaire).
-- Intérêts : cybersécurité (labs THM / HTB) et infra. Niveau dev : les bases (dit par Ethan le 31/10), ne jamais le présenter comme développeur confirmé. **Ne jamais écrire sur le site que ses projets ont été faits avec l'IA** (demande d'Ethan du 01/11) : l'IA apparaît seulement comme une compétence (touche Claude Code, sans « Utilisé : »). **Plus aucune mention de DFIR / CTI / threat intel** (demande d'Ethan du 31/10 : il n'en a jamais fait). « À propos » et la carte « Cybersécurité » réécrits le 31/10 sur cette base.
+- Intérêts : cybersécurité (labs THM / HTB) et infra. Niveau dev : les bases (dit par Ethan le 31/10), ne jamais le présenter comme développeur confirmé. **Ne jamais écrire sur le site que ses projets ont été faits avec l'IA** (demande d'Ethan du 01/11) : l'IA apparaît seulement comme une compétence (touche Claude Code). **Plus aucune mention de DFIR / CTI / threat intel** (demande d'Ethan du 31/10 : il n'en a jamais fait). « À propos » et la carte « Cybersécurité » réécrits le 31/10 sur cette base.
 - Niveau (à respecter dans tous les textes) : bases solides en infra/cyber et plusieurs langages ; **pas encore de certification** ; ne jamais gonfler.
 - Email : `ethan.bacquier@gmail.com` (bouton copier + mailto)
 - Discord : `tatoune` (bouton « copier le pseudo », pas d'URL)
@@ -200,10 +200,10 @@ Pour 6 à 9 : avant de passer `draft` à `false`, lire le code et **les commits 
 Regardés le 31/10, non retenus : `biblio-groupe-15` (gestion de bibliothèque en Python/SQLite, groupe de 4 ; seul commit d'Ethan : l'ADR « requêtes SQL paramétrées » contre l'injection SQL), `togethapp` (app mobile React Native/Expo + Supabase : village tower defense coopératif à 2, compagnon type Tamagotchi, mini-jeux ; repo privé, 1 commit).
 Ne **pas** utiliser : `tp-template-golang`, `algo-projet`, `ynov_2025_bachelor_1`, `exam-git-avanc-*` (non retenus par Ethan).
 
-### 4.5 skills.json (22 touches)
+### 4.5 skills.json (24 touches, refait le 11/11)
 En tête : `"_note": "Ne garde que les outils que tu sais expliquer en entretien."`
-Chaque entrée : `id, label, category, icon (id iconify ou null), mono (monogramme si pas de logo), hotkey (lettre unique), quip, usedIn[]`.
-`usedIn` = où Ethan s'est servi de l'outil (réponses d'Ethan du 17/10), affiché « Utilisé : … » sous la phrase, dans le texte du clavier et dans la liste. Valeurs : « Cours à Ynov », « TryHackMe / HTB », « Projets perso », ou un exercice précis (Wireshark → Machine Cap (HTB) ; Nmap → Machines Cap et Nexus (HTB) ; Metasploit → Room Blue (THM) ; John/Hashcat → Room Blue (THM), badge Hash Cracker ; Go → Power 4 Web, RedQuest ; HTML/CSS et JS → Cabinet infirmier, Refonte du VBVB ; Vue → Mon ancien portfolio, Hera (panel admin) ; JavaScript → aussi Hera (panel admin) ; Python et Docker → aussi Hera (prototype Garmin), d'après le code de ses repos ; Git → Tous mes projets GitHub). Ne jamais ajouter un lieu qu'Ethan n'a pas confirmé. Noms longs d'un seul mot (> 8 lettres) : taille réduite (`toolbox__name--long`). Ton complice, jamais vantard. 17 logos Simple Icons ; AD, Réseau, Nmap, Gobuster et John/Hashcat utilisent leur monogramme. Logos à traits fins épaissis à la texture (`BOLD` dans `KeyboardScene.tsx` : Kali, Linux).
+Chaque entrée : `id, label, icon (id iconify ou null), mono (monogramme si pas de logo), hotkey (lettre unique), quip`.
+**11/11, demande d'Ethan** : plus de catégories (ni couleurs par catégorie, ni légende, ni libellé de catégorie), plus de « Utilisé : … » (champ `usedIn` supprimé), plus de bouton « Voir en liste » (la liste reste uniquement en secours : sans WebGL, sans JS, « réduire les animations »). Touche **Vue retirée**. **Ajoutées** : Windows Server (`SRV`, raccourci V) — « Des rôles, des services, et un admin qui garde les clés. » ; SQL (`SQL`, S) — « SELECT * FROM problèmes. Requêtes paramétrées, évidemment. » ; OSINT (`OSINT`, T) — « Une photo, un pseudo… et le puzzle se reconstitue. » (monogrammes : pas de logo officiel). Ne pas réintroduire catégories ni « Utilisé » sans demande. Noms longs d'un seul mot (> 8 lettres) : taille réduite (`toolbox__name--long`). Ton complice, jamais vantard. Logos à traits fins épaissis à la texture (`BOLD` dans `KeyboardScene.tsx` : Kali, Linux). Les groupes ci-dessous ne servent plus qu'à ranger l'ordre des touches.
 
 **Prog & web** (`prog`, aubergine `#6A4766`)
 - Python — « Le couteau suisse : un script et le problème est réglé. »
@@ -212,9 +212,8 @@ Chaque entrée : `id, label, category, icon (id iconify ou null), mono (monogram
 - C — « Les pointeurs et moi, on apprend à se faire confiance. »
 - HTML/CSS — « Centrer une div : mission accomplie. »
 - JavaScript — « undefined is not a function… et pourtant ça marche. »
-- Vue — « Mon ancien portfolio, c'était lui. »
 - Git — « git commit -m "ça marche (je crois)" »
-- Claude Code — « Bien poser le problème, c'est déjà la moitié de la solution. » (ajouté le 31/10, compétence seule : `usedIn` vide, aucun projet présenté comme fait avec l'IA ; logo Simple Icons `claude`)
+- Claude Code — « Bien poser le problème, c'est déjà la moitié de la solution. » (ajouté le 31/10, compétence seule, aucun projet présenté comme fait avec l'IA ; logo Simple Icons `claude`)
 
 **Système & infra** (`infra`, ardoise `#5E6B85`)
 - Linux — « Mon terrain de jeu préféré. »
@@ -395,15 +394,15 @@ Pin ~150vh (≥ 1024 px uniquement) : l'avatar glisse de la colonne « À propos
 « MA BOÎTE » / « À OUTILS » + « (astuce : survole ou appuie sur une touche) ».
 - **Clavier compact réel** (refait le 29/10 avec Ethan, décisions issues d'un grill) dans `KeyboardScene.tsx` :
   - **Boîtier en noyer moyen** (brun noisette, veinage fin dessiné en code `makeWalnutTexture`, finition satinée huilée), **penché** (`TILT` ≈ 6°, plus haut à l'arrière, fond plat), **rebord fin** (`RIM` ≈ 1/3 de touche), bords arrondis ; les touches sont dans un **renfoncement** sur une **plaque gris anthracite mate**. Ethan a refusé : socle noir plat, liseré néon violet, marge large, lueur violette entre les touches, fond violet, bois plus clair (« miel »).
-  - **Disposition `ROWS`** (9,5 unités × 5 rangées) : échap · 6 outils · effacer / tab · 6 outils · [ $ / verr maj · 5 outils · entrée / maj · 5 outils · maj / ctrl · alt · barre d'espace · alt gr · fn. Les 22 outils occupent les touches de lettres (6-6-5-5) dans l'ordre de `skills.json` (si on ajoute un outil, il faut ajouter une place dans `ROWS`). Les touches de modification sont décoratives (gris taupe `MOD_COLOR`, libellé discret en bas à gauche, sans survol). Même disposition sur mobile.
+  - **Disposition `ROWS`** (9,5 unités × 5 rangées) : échap · 7 outils · effacer / tab · 7 outils · $ / verr maj · 5 outils · entrée / maj · 5 outils · maj / ctrl · alt · barre d'espace · alt gr · fn. Les 24 outils occupent les touches de lettres (7-7-5-5, depuis le 11/11) dans l'ordre de `skills.json` (si on ajoute un outil, il faut ajouter une place dans `ROWS`). Les touches de modification sont décoratives (gris chaud `MOD_COLOR`, libellé discret en bas à gauche, sans survol). Même disposition sur mobile.
   - **Touches réalistes** (`makeKeyGeometry`) : base plus large que le dessus, dessus creusé d'avant en arrière (cuvette cylindrique), finition mate ; grille régulière arrondie à la main (`RoundedBoxGeometry` n'a pas de sommets au centre des faces). Logos et monogrammes en **blanc cassé** (`INK`) sur une étiquette courbée comme la cuvette ; la lettre du raccourci est en haut à gauche.
   - Rotation du socle `TURN` (bureau -0,26 rad, mobile -0,08 rad) ; le cadrage recule la caméra juste assez pour que le boîtier tienne entier. Lumières neutres et chaudes (le bois doit rester brun), violet seulement en contre-jour. `ContactShadows` hors du groupe qui tourne, sous le biseau du fond.
-- Couleurs par catégorie en **tons poudrés mats** (aubergine `#6A4766`, ardoise `#5E6B85`, vieux rose `#B07A86`, lilas `#8F86B3`), identiques dans `skills.json` et `main.css` (`[data-cat]`), + légende cliquable (surbrillance de la catégorie).
-- Dessus de keycap : logo (texture SVG → canvas, repeint en blanc cassé) ou monogramme en police système grasse.
-- Survol / toucher ou clic (`onPointerDown`, indispensable sur téléphone où il n'y a pas de survol) / touche physique : enfoncement puis remontée `elastic.out`, émissif, onde discrète sur la plaque ; à gauche, gros texte incliné (-12° desktop, -4° mobile, au-dessus du clavier) : nom (police système 800, couleur de la catégorie) + quip + catégorie. Avant toute touche : « 22 outils ». **Sur téléphone (< 768 px), seul le nom s'affiche** (phrase, « Utilisé : … » et catégorie restent pour les lecteurs d'écran) et le clavier prend toute la largeur de l'écran (30/10) ; sur téléphone, il est vu plus en plongée (~62° au lieu de ~50°), presque droit (`TURN.mobile.base` -0,04) avec une marge de cadrage réduite et une scène plus haute (`min(76vw, 400px)`) : touches ~25 % plus hautes (30/10, demandé par Ethan).
+- **Couleur unique depuis le 11/11** (Ethan n'aimait pas les couleurs par catégorie) : touches d'outils **crème mat** (`KEY_COLOR` `#E6DECD`), logos et libellés **gris encre** (`INK` `#2B2730`), touches de modification gris chaud (`MOD_COLOR` `#B3A994`), lueur lavande à l'enfoncement (`KEY_GLOW`). Plus de légende ni de surbrillance de catégorie.
+- Dessus de keycap : logo (texture SVG → canvas, repeint en gris encre) ou monogramme en police système grasse.
+- Survol / toucher ou clic (`onPointerDown`, indispensable sur téléphone où il n'y a pas de survol) / touche physique : enfoncement puis remontée `elastic.out`, émissif, onde discrète sur la plaque ; à gauche, gros texte incliné (-12° desktop, -4° mobile, au-dessus du clavier) : nom (police système 800, `--text`) + quip. Avant toute touche : « 24 outils ». **Sur téléphone (< 768 px), seul le nom s'affiche** (la phrase reste pour les lecteurs d'écran) et le clavier prend toute la largeur de l'écran (30/10) ; sur téléphone, il est vu plus en plongée (~62° au lieu de ~50°), presque droit (`TURN.mobile.base` -0,04) avec une marge de cadrage réduite et une scène plus haute (`min(76vw, 400px)`) : touches ~25 % plus hautes (30/10, demandé par Ethan).
 - Hotkeys : seulement si la section est visible **et** qu'aucun champ n'a le focus ; jamais avec Ctrl/Alt/Meta.
 - Rotation y au scroll (scrub), amplitude réduite : ±5° bureau, ±3° mobile.
-- `<ul>` réelle des compétences dans le DOM (bouton « Voir en liste ») ; c'est la version affichée sous reduced-motion, sans WebGL et sans JS.
+- `<ul>` réelle des compétences dans le DOM, affichée seulement en secours (reduced-motion, sans WebGL, sans JS) ; plus de bouton « Voir en liste » (11/11).
 - **Rien d'autre que des keycaps sur le clavier** (aucun personnage, aucune mascotte).
 
 ### 7. Terrain d'entraînement (refait le 30/10 : tuiles façon widgets iPhone)
@@ -570,7 +569,7 @@ object-src 'none';
 - **Préchauffage 3D** : les scènes clavier et bulles sont montées hors écran dès que le navigateur est au repos après le chargement (`useIdleMount`, échelonné), avec compilation des shaders, envoi des textures et un rendu à blanc (`Warmup`). Sans ça, la compilation se terminait au premier affichage, en plein défilement.
 - Appareil « modeste » (`hardwareConcurrency ≤ 4` ou `deviceMemory ≤ 4`, comme le brief) : images fixes à la place de l'avatar 3D. Seuil réglable dans `src/App.tsx` si trop de PC portables tombent dedans.
 - Les apparitions au défilement utilisent `opacity` (pas `visibility`) : tout reste atteignable au clavier.
-- Couleurs de catégorie en double (JSON pour la 3D, CSS `[data-cat]` pour le HTML) : la CSP interdit les attributs `style` dans le HTML pré-rendu.
+- Couleurs de catégorie : supprimées le 11/11 (rappel : la CSP interdit les attributs `style` dans le HTML pré-rendu).
 - Onglet CV vertical masqué sur mobile ; le CV est dans le menu.
 - Le formulaire Web3Forms n'apparaît qu'avec `VITE_FORM_KEY` ; sinon bloc « Écris-moi directement ».
 - Rendus de l'avatar découpés (scissor) à son emplacement, avec un fondu en bas de l'emplacement pour masquer la coupe : depuis le 23/10, ce fondu est dessiné dans la scène 3D (bande `buildFade` collée à la caméra, hero et À propos), plus en CSS.
@@ -598,8 +597,12 @@ object-src 'none';
 - Contact : flèches et icônes « copier » dans la même colonne. Pied de page : trait de séparation aligné sur le contenu.
 
 ### Pistes examinées le 17/10 (grill « améliorations »)
-- **Fait** : « Utilisé : … » sur les touches, boutons du hero, alternance B3 mise en avant, « Ce que j'ai appris », encart sécurité, emplacement témoignages.
+- **Fait** : « Utilisé : … » sur les touches (retiré le 11/11 à la demande d'Ethan), boutons du hero, alternance B3 mise en avant, « Ce que j'ai appris », encart sécurité, emplacement témoignages.
 - **Écarté pour l'instant** (ne pas réintroduire sans demande) : rapports d'exercices détaillés (enquêtes type alerte → recherche → conclusion), bloc « En ce moment », statistiques de visite (le site reste **zéro tracker**), page sécurité dédiée (un encart suffit).
+
+### Corrections du 11/11
+- **Yeux fermés en remontant la page** : React Three Fiber remet `clock.elapsedTime` à 0 quand le canevas de l'avatar sort de pause (`frameloop` « never » → « always ») ; la fin du clignement restait loin dans le futur. `AvatarStage.tsx` utilise désormais sa propre horloge (`s.time += delta`). Ne pas revenir à `state.clock.elapsedTime` dans un canevas qui se met en pause.
+- **Haut de la chemise qui passait dans le corps à la respiration** : seul le torse était agrandi ; col, pointes de col, peau du V, patte et boutons restaient fixes et s'y enfonçaient. Ils sont maintenant dans le même groupe `shirt` que le torse (`avatar.torso` = ce groupe), mis à l'échelle ensemble.
 
 ### Profil GitHub (11/11)
 Repo de profil `zTatoune/zTatoune` (README affiché sur github.com/zTatoune) : bannière fournie par Ethan (ville rouge et noir), animée en SVG, + terminal animé (que des commandes qu'il a vraiment lancées) et clavier d'outils. Ton détendu pour étudiants et devs, en français. Générateur : `tools/gen.py` dans ce repo.

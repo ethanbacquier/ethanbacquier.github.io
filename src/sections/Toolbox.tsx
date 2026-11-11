@@ -1,6 +1,4 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import IconList from '~icons/solar/list-linear';
-import IconKeyboard from '~icons/solar/keyboard-linear';
 import skillsData from '../data/skills.json';
 import { gsap, isReducedMotion } from '../lib/motion';
 import { revealWords } from '../lib/reveal';
@@ -12,12 +10,9 @@ import { SplitHeading } from '../components/SplitHeading';
 const KeyboardScene = lazy(() => import('../three/KeyboardScene'));
 
 export type Skill = (typeof skillsData.skills)[number];
-export type Category = (typeof skillsData.categories)[number];
 export type PressSignal = { id: string; n: number } | null;
 
 const skills = skillsData.skills;
-const categories = skillsData.categories;
-const catById = Object.fromEntries(categories.map((c) => [c.id, c]));
 
 export function Toolbox() {
   const root = useRef<HTMLElement>(null);
@@ -28,17 +23,12 @@ export function Toolbox() {
   const near = nearView || idleMount;
   const visible = useInView(root, '0px');
   const [use3D, setUse3D] = useState(false);
-  const [listOpen, setListOpen] = useState(true);
   const [active, setActive] = useState<string | null>(null);
   const [press, setPress] = useState<PressSignal>(null);
-  const [highlight, setHighlight] = useState<string | null>(null);
   const scroll = useRef({ rotation: 0 });
 
   useEffect(() => {
-    if (canRun3D()) {
-      setUse3D(true);
-      setListOpen(false);
-    }
+    if (canRun3D()) setUse3D(true);
   }, []);
 
   useEffect(() => {
@@ -102,7 +92,7 @@ export function Toolbox() {
                 <span className="only-touch">(astuce&nbsp;: appuie sur une touche)</span>
               </>
             ) : (
-              `${skills.length} outils, classés par domaine`
+              `${skills.length} outils`
             )}</p>
         </div>
 
@@ -111,15 +101,10 @@ export function Toolbox() {
             <div ref={readout} className="toolbox__readout" aria-live="polite">
               {current ? (
                 <>
-                  <p
-                    className={`toolbox__name${Math.max(...current.label.split(' ').map((w) => w.length)) > 8 ? ' toolbox__name--long' : ''}`}
-                    data-cat={current.category}
-                  >
+                  <p className={`toolbox__name${Math.max(...current.label.split(' ').map((w) => w.length)) > 8 ? ' toolbox__name--long' : ''}`}>
                     {current.label}
                   </p>
                   <p className="toolbox__quip">{current.quip}</p>
-                  {current.usedIn?.length ? <p className="toolbox__used">Utilisé&nbsp;: {current.usedIn.join(' · ')}</p> : null}
-                  <p className="label toolbox__cat">{catById[current.category]?.label}</p>
                 </>
               ) : (
                 <>
@@ -136,17 +121,12 @@ export function Toolbox() {
                 <Suspense fallback={null}>
                   <KeyboardScene
                     skills={skills}
-                    categories={categories}
                     active={active}
                     press={press}
-                    highlight={highlight}
                     onHover={(id) => id && setActive(id)}
                     paused={!visible}
                     scroll={scroll.current}
-                    onLost={() => {
-                      setUse3D(false);
-                      setListOpen(true);
-                    }}
+                    onLost={() => setUse3D(false)}
                   />
                 </Suspense>
               )}
@@ -154,41 +134,12 @@ export function Toolbox() {
           </div>
         )}
 
-        <div className="toolbox__bar">
-          <ul className="legend" aria-label="Catégories">
-            {categories.map((c) => (
-              <li key={c.id}>
-                <button
-                  type="button"
-                  className="legend__item"
-                  aria-pressed={highlight === c.id}
-                  onClick={() => setHighlight((h) => (h === c.id ? null : c.id))}
-                >
-                  <span className="legend__swatch" data-cat={c.id} aria-hidden="true" />
-                  {c.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {use3D && (
-            <button type="button" className="btn btn--ghost btn--sm" aria-expanded={listOpen} aria-controls="skills-list" onClick={() => setListOpen((v) => !v)}>
-              {listOpen ? <IconKeyboard aria-hidden="true" /> : <IconList aria-hidden="true" />}
-              {listOpen ? 'Masquer la liste' : 'Voir en liste'}
-            </button>
-          )}
-        </div>
-
-        <ul id="skills-list" className="skills-list" hidden={!listOpen}>
+        {/* Liste de secours : sans 3D, sans JS ou sous « réduire les animations » */}
+        <ul id="skills-list" className="skills-list" hidden={use3D}>
           {skills.map((s) => (
-            <li
-              key={s.id}
-              className={`skills-list__item${highlight && highlight !== s.category ? ' is-dim' : ''}`}
-              data-cat={s.category}
-            >
+            <li key={s.id} className="skills-list__item">
               <span className="skills-list__name">{s.label}</span>
-              <span className="skills-list__cat">{catById[s.category]?.label}</span>
               <span className="skills-list__quip">{s.quip}</span>
-              {s.usedIn?.length ? <span className="skills-list__used">Utilisé&nbsp;: {s.usedIn.join(' · ')}</span> : null}
             </li>
           ))}
         </ul>

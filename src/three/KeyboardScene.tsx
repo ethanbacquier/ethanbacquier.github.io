@@ -4,17 +4,15 @@ import { ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import icons from '../generated/keycap-icons.json';
-import type { Category, PressSignal, Skill } from '../sections/Toolbox';
+import type { PressSignal, Skill } from '../sections/Toolbox';
 import { markWebGLLost } from '../lib/capabilities';
 import { Warmup } from './Warmup';
 import { makeWalnutTexture } from './walnut';
 
 type Props = {
   skills: Skill[];
-  categories: Category[];
   active: string | null;
   press: PressSignal;
-  highlight: string | null;
   onHover: (id: string | null) => void;
   paused: boolean;
   scroll: { rotation: number };
@@ -24,11 +22,12 @@ type Props = {
 const KEY = 0.86;
 const PITCH = 1.0;
 const GAP = PITCH - KEY;
-const DIM = new THREE.Color('#2A2533');
-const INK = '#F1EADF'; // logos et monogrammes : blanc cassé mat
+const KEY_COLOR = '#E6DECD'; // touches d'outils : crème mat, façon clavier rétro
+const KEY_GLOW = '#B49CFF'; // lueur lavande quand la touche est enfoncée
+const INK = '#2B2730'; // logos, monogrammes et libellés : gris encre
 /** Épaississement (px sur 512) des logos à traits trop fins pour se lire sur une touche */
 const BOLD: Record<string, number> = { kali: 6, linux: 3 };
-const MOD_COLOR = '#46424C'; // touches de modification : gris taupe, non interactives
+const MOD_COLOR = '#B3A994'; // touches de modification : gris chaud, non interactives
 
 // Boîtier en noyer moyen : penché (plus haut à l'arrière), rebord fin, touches dans un renfoncement sur plaque anthracite
 const TILT = 0.1; // rad, ~6° : inclinaison du plan des touches
@@ -148,15 +147,15 @@ function makeCaseGeometry(outerW: number, outerD: number, innerW: number, innerD
   return g;
 }
 
-// Disposition d'un clavier compact réel, 9,5 unités de large sur 5 rangées : les 22 outils occupent les
-// touches de lettres (6-6-5-5), entourées des touches de modification à leurs largeurs habituelles.
+// Disposition d'un clavier compact réel, 9,5 unités de large sur 5 rangées : les 24 outils occupent les
+// touches de lettres (7-7-5-5), entourées des touches de modification à leurs largeurs habituelles.
 // Le décalage des rangées vient, comme sur un vrai clavier, de la largeur de tab / verr maj / maj.
 type Slot = { units: number; mod?: string };
 const mod = (label: string, units: number): Slot => ({ units, mod: label });
 const letters = (n: number): Slot[] => Array.from({ length: n }, () => ({ units: 1 }));
 const ROWS: Slot[][] = [
-  [mod('échap', 1), ...letters(6), mod('effacer', 2.5)],
-  [mod('tab', 1.5), ...letters(6), mod('[', 1), mod('$', 1)],
+  [mod('échap', 1), ...letters(7), mod('effacer', 1.5)],
+  [mod('tab', 1.5), ...letters(7), mod('$', 1)],
   [mod('verr maj', 1.75), ...letters(5), mod('entrée', 2.75)],
   [mod('maj', 2.25), ...letters(5), mod('maj', 2.25)],
   [mod('ctrl', 1.25), mod('alt', 1.25), mod('', 4.75), mod('alt gr', 1.25), mod('fn', 1)],
@@ -184,7 +183,7 @@ function makeModTexture(label: string, units: number): THREE.CanvasTexture {
 // Rotation du socle : position de base et amplitude au défilement (plus droite sur mobile, où la largeur manque)
 const TURN = { desktop: { base: -0.26, swing: 0.6 }, mobile: { base: -0.04, swing: 0.35 } };
 
-/** Texture du dessus de touche : logo blanc (ou monogramme) + lettre du raccourci. */
+/** Texture du dessus de touche : logo (ou monogramme) à l'encre + lettre du raccourci. */
 function makeCapTexture(skill: Skill): THREE.CanvasTexture {
   const size = 512;
   const canvas = document.createElement('canvas');
@@ -217,7 +216,7 @@ function makeCapTexture(skill: Skill): THREE.CanvasTexture {
     ctx.textAlign = 'left';
   };
 
-  // Les logos générés sont blancs : on repeint tout ce qui est dessiné en blanc cassé
+  // Les logos générés sont blancs : on repeint tout ce qui est dessiné en gris encre (INK)
   const ink = () => {
     ctx.globalCompositeOperation = 'source-atop';
     ctx.fillStyle = INK;
@@ -256,9 +255,9 @@ function makeCapTexture(skill: Skill): THREE.CanvasTexture {
   return texture;
 }
 
-type KeyRef = { group: THREE.Group; mat: THREE.MeshStandardMaterial; base: THREE.Color; pressed: boolean };
+type KeyRef = { group: THREE.Group; mat: THREE.MeshStandardMaterial; pressed: boolean };
 
-function Keyboard({ skills, categories, active, press, highlight, onHover, scroll }: Omit<Props, 'paused' | 'onLost'>) {
+function Keyboard({ skills, active, press, onHover, scroll }: Omit<Props, 'paused' | 'onLost'>) {
   const { size, camera } = useThree();
   const mobile = size.width < 640;
   const board = useRef<THREE.Group>(null);
@@ -266,7 +265,6 @@ function Keyboard({ skills, categories, active, press, highlight, onHover, scrol
   const ripples = useRef<THREE.Mesh[]>([]);
   const rippleIndex = useRef(0);
 
-  const colorOf = useMemo(() => Object.fromEntries(categories.map((c) => [c.id, c.color])), [categories]);
   const capGeo = useMemo(() => makeKeyGeometry(1), []);
   const labelGeo = useMemo(() => makeLabelGeometry(TOP_HALF * 1.5, TOP_HALF * 1.5), []);
   const walnut = useMemo(() => makeWalnutTexture(0.22, 0.45), []);
@@ -359,17 +357,12 @@ function Keyboard({ skills, categories, active, press, highlight, onHover, scrol
     gsap.killTweensOf(k.group.position);
     if (down) {
       gsap.to(k.group.position, { y: -0.14, duration: 0.12, ease: 'power2.out' });
-      gsap.to(k.mat, { emissiveIntensity: 0.9, duration: 0.15 });
+      gsap.to(k.mat, { emissiveIntensity: 0.45, duration: 0.15 });
       ripple(k.group.position.x, k.group.position.z);
     } else {
       gsap.to(k.group.position, { y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
-      gsap.to(k.mat, { emissiveIntensity: highlightLevel(id), duration: 0.4 });
+      gsap.to(k.mat, { emissiveIntensity: 0, duration: 0.4 });
     }
-  };
-
-  const highlightLevel = (id: string) => {
-    const skill = skills.find((s) => s.id === id);
-    return highlight && skill?.category === highlight ? 0.35 : 0;
   };
 
   const ripple = (x: number, z: number) => {
@@ -390,17 +383,6 @@ function Keyboard({ skills, categories, active, press, highlight, onHover, scrol
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [press]);
-
-  // Surbrillance d'une catégorie
-  useEffect(() => {
-    keys.current.forEach((k, id) => {
-      const skill = skills.find((s) => s.id === id);
-      const dimmed = highlight && skill?.category !== highlight;
-      gsap.to(k.mat.color, { r: dimmed ? DIM.r : k.base.r, g: dimmed ? DIM.g : k.base.g, b: dimmed ? DIM.b : k.base.b, duration: 0.35 });
-      if (!k.pressed) gsap.to(k.mat, { emissiveIntensity: highlightLevel(id), duration: 0.35 });
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [highlight]);
 
   useFrame(() => {
     if (board.current) board.current.rotation.y = turn.base + scroll.rotation * turn.swing;
@@ -433,7 +415,6 @@ function Keyboard({ skills, categories, active, press, highlight, onHover, scrol
         ))}
 
         {layout.items.map(({ skill, x, z }) => {
-          const color = new THREE.Color(colorOf[skill.category]);
           return (
             <group
               key={skill.id}
@@ -443,7 +424,7 @@ function Keyboard({ skills, categories, active, press, highlight, onHover, scrol
                 const mesh = g.children[0] as THREE.Mesh;
                 const existing = keys.current.get(skill.id);
                 if (!existing || existing.group !== g) {
-                  keys.current.set(skill.id, { group: g, mat: mesh.material as THREE.MeshStandardMaterial, base: color.clone(), pressed: false });
+                  keys.current.set(skill.id, { group: g, mat: mesh.material as THREE.MeshStandardMaterial, pressed: false });
                 }
               }}
             >
@@ -466,7 +447,7 @@ function Keyboard({ skills, categories, active, press, highlight, onHover, scrol
                   if (e.nativeEvent.pointerType !== 'mouse') window.setTimeout(() => setPressed(skill.id, false), 220);
                 }}
               >
-                <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0} roughness={0.72} metalness={0} />
+                <meshStandardMaterial color={KEY_COLOR} emissive={KEY_GLOW} emissiveIntensity={0} roughness={0.72} metalness={0} />
               </mesh>
               <mesh geometry={labelGeo} position={[0, KEY_H / 2 + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
                 <meshBasicMaterial map={textures[skill.id]} transparent toneMapped={false} opacity={active === skill.id ? 1 : 0.92} />

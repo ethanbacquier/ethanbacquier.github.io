@@ -557,17 +557,21 @@ export function buildAvatar() {
 
   // Torse : silhouette en V (épaules larges, taille plus fine), poitrine légèrement bombée, dos plus
   // plat. L'ouverture du col est une pièce de peau posée sur le torse (buildVNeckGeometry).
+  // Tout ce qui est posé sur la chemise (col, patte, boutons, peau du V) vit dans le même groupe que le
+  // torse : la respiration met ce groupe à l'échelle, rien ne s'enfonce dans le torse quand il gonfle.
+  const shirt = new THREE.Group();
+  chest.add(shirt);
   const torso = mesh(buildTorsoGeometry(), M.shirt);
-  chest.add(torso);
+  shirt.add(torso);
   torso.updateMatrixWorld(true);
-  chest.add(mesh(buildVNeckGeometry(torso), M.skin));
+  shirt.add(mesh(buildVNeckGeometry(torso), M.skin));
   const onTorso = (obj, x, y, lift = 0.002, spin = 0) => {
     placeOn(torso, obj, new THREE.Vector3(x, y, 1), new THREE.Vector3(0, 0, -1), lift, spin);
-    chest.add(obj);
+    shirt.add(obj);
     return obj;
   };
   // Ourlet du bas de la chemise
-  chest.add(mesh(new THREE.TorusGeometry(0.181, 0.006, 10, 64), M.shirt, { p: [0, -0.232, 0], r: [Math.PI / 2, 0, 0], s: [1, 0.7 * 0.97, 1] }));
+  shirt.add(mesh(new THREE.TorusGeometry(0.181, 0.006, 10, 64), M.shirt, { p: [0, -0.232, 0], r: [Math.PI / 2, 0, 0], s: [1, 0.7 * 0.97, 1] }));
   // Patte de boutonnage en léger relief + boutons
   onTorso(mesh(new RoundedBoxGeometry(0.026, 0.3, 0.004, 2, 0.0018), M.placket), 0, -0.04, 0.001);
   const buttonGeo = new THREE.CylinderGeometry(0.0075, 0.0075, 0.004, 16);
@@ -581,7 +585,7 @@ export function buildAvatar() {
   const COLLAR_GAP = 0.95;
   const collarProfile = [[0.104, 0.226], [0.098, 0.242], [0.088, 0.262], [0.078, 0.276], [0.07, 0.279], [0.066, 0.272], [0.066, 0.25]]
     .map(([x, y]) => new THREE.Vector2(x, y));
-  chest.add(mesh(new THREE.LatheGeometry(collarProfile, 48, COLLAR_GAP / 2, Math.PI * 2 - COLLAR_GAP), M.collar, { s: [1, 1, 0.82] }));
+  shirt.add(mesh(new THREE.LatheGeometry(collarProfile, 48, COLLAR_GAP / 2, Math.PI * 2 - COLLAR_GAP), M.collar, { s: [1, 1, 0.82] }));
   const collarPoint = new THREE.Shape();
   collarPoint.moveTo(-0.004, 0.012);
   collarPoint.quadraticCurveTo(0.03, 0.016, 0.05, 0.004);
@@ -727,7 +731,7 @@ export function buildAvatar() {
     setBlink(blinkOpen);
   };
 
-  return { root, hips, spine, chest, neck, head, torso, eyes, arms, legs, setGaze, setBlink, setSmile };
+  return { root, hips, spine, chest, neck, head, torso: shirt, eyes, arms, legs, setGaze, setBlink, setSmile };
 }
 
 // ---------- Bureau, chaise, écran ----------

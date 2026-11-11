@@ -51,7 +51,7 @@ Tout le texte vit dans `src/data/`. Règle commune : une valeur à `null` est ma
 | Fichier | Ce qu'il contient |
 |---|---|
 | `profile.json` | nom, statut, e-mail, Discord, liens, texte « À propos », bloc « Hors écran », cartes « Ce que je fais », CV |
-| `skills.json` | les 21 touches du clavier (si tu en ajoutes une, ajoute aussi une place dans `ROWS` de `KeyboardScene.tsx`) : nom, catégorie, logo, lettre du raccourci, phrase, où tu t'en es servi (`usedIn`) |
+| `skills.json` | les 24 touches du clavier (si tu en ajoutes une, ajoute aussi une place dans `ROWS` de `KeyboardScene.tsx`) : nom, logo, monogramme, lettre du raccourci, phrase |
 | `projects.json` | les bulles projets |
 | `timeline.json` | le parcours |
 | `training.json` | stats TryHackMe et Hack The Box, certification |
@@ -64,7 +64,7 @@ Tout le texte vit dans `src/data/`. Règle commune : une valeur à `null` est ma
 - **Mettre à jour tes stats** : modifie `training.json`, puis change `updatedAt` (la date s'affiche sur le site). Mets `null` pour masquer une stat.
 - **Ajouter une compétence** : ajoute une entrée dans `skills.json` avec une lettre de raccourci encore libre. Pour le logo, mets un identifiant [Simple Icons](https://simpleicons.org/) (`"simple-icons:nom"`), ou `null` pour afficher le monogramme (`mono`). Le build signale un logo introuvable.
 - **Ajouter un témoignage** : dans `testimonials.json`, ajoute `{ "quote": "…", "name": "Prénom Nom", "role": "…", "org": "…", "consent": true, "draft": false }`. Uniquement avec l'accord de la personne.
-- **Changer une couleur de catégorie** : mets-la à jour dans `skills.json` (clavier 3D) **et** dans `src/styles/main.css`, section « Couleurs des catégories » (liste HTML).
+- **Changer la couleur des touches** : `KEY_COLOR`, `INK` et `MOD_COLOR` en tête de `src/three/KeyboardScene.tsx`.
 
 ### Ajouter un projet
 

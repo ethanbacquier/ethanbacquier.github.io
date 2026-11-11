@@ -31,7 +31,6 @@
   --glass-edge: color-mix(in srgb, var(--text) 12%, transparent);
   --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.07); /* arête claire : la lumière accroche le bord du verre */
   --float-shadow: 0 20px 60px -20px rgb(0 0 0 / 0.7);
-  --cat-base: #ffffff; /* teinte mélangée aux couleurs de catégorie pour le nom des outils */
   --glow: radial-gradient(circle, rgb(109 40 217 / 0.35) 0%, rgb(109 40 217 / 0.1) 42%, transparent 70%);
   /* Fond de page (Backdrop.tsx) : trois lueurs qui dérivent au défilement + grain. En sombre, à peine visibles */
   --orb-a: rgb(124 58 237 / 0.16); /* violet, en haut à gauche */
@@ -85,7 +84,6 @@
   --glass-edge: rgb(23 18 31 / 0.08);
   --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.85);
   --float-shadow: 0 20px 50px -18px rgb(46 26 92 / 0.28);
-  --cat-base: #17121f;
   --glow: radial-gradient(circle, rgb(124 58 237 / 0.2) 0%, rgb(124 58 237 / 0.06) 42%, transparent 70%);
   /* Lumière du matin : lavande en haut à gauche, pêche à droite, lilas bleuté en bas */
   --orb-a: rgb(167 139 250 / 0.38);
@@ -164,8 +162,7 @@ select {
 }
 button,
 .btn,
-.chip-btn,
-.legend__item {
+.chip-btn {
   -webkit-user-select: none;
   user-select: none; /* un appui long ne sélectionne pas le libellé */
 }
@@ -381,7 +378,6 @@ main {
 .btn:active,
 .chip-btn:active,
 .icon-btn:active:not(:disabled),
-.legend__item:active,
 .menu-toggle:active,
 .theme-toggle:active,
 .badge:active,
@@ -1600,13 +1596,6 @@ textarea {
   font-size: clamp(1rem, 1.3vw, 1.2rem);
   max-width: 26ch;
 }
-.toolbox__used {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--accent);
-  max-width: 34ch;
-  font-weight: 500;
-}
 .toolbox__stage {
   position: relative;
   height: clamp(360px, 44vw, 600px);
@@ -1617,48 +1606,6 @@ textarea {
   /* L'ombre douce sous le clavier peut toucher les bords du canevas : fondu sur les côtés, pas de coupure nette */
   -webkit-mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
   mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
-}
-.toolbox__bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 24px;
-}
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.legend__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 8px 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--bg-2);
-  font-size: 14px;
-  color: var(--text);
-  transition: border-color 0.2s ease, background-color 0.2s ease, transform 160ms var(--ease-out);
-}
-.legend__item[aria-pressed='true'] {
-  border-color: var(--accent);
-}
-@media (hover: hover) and (pointer: fine) {
-  .legend__item:hover {
-    border-color: var(--accent);
-  }
-}
-.legend__item[aria-pressed='true'] {
-  background: var(--bg-3);
-}
-.legend__swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
 }
 .skills-list {
   display: grid;
@@ -1672,35 +1619,19 @@ textarea {
   padding: 16px 18px;
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-shine), var(--card-shadow);
-  border-left: 3px solid var(--cat, var(--accent));
+  border-left: 3px solid var(--accent);
   border-radius: 14px;
   background: var(--glass);
   transition: opacity 0.2s;
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
 }
-.skills-list__item.is-dim {
-  opacity: 0.35;
-}
 .skills-list__name {
   font-weight: 600;
-}
-.skills-list__cat {
-  font-family: var(--font-body);
-  font-size: 13px;
-  letter-spacing: 0;
-  color: var(--muted);
-  font-weight: 500;
 }
 .skills-list__quip {
   font-size: 15px;
   color: var(--text);
-}
-.skills-list__used {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 500;
 }
 
 /* ---------- Entraînement : tuiles façon widgets ---------- */
@@ -2955,9 +2886,7 @@ button.quick-link:active {
   }
   /* Sur téléphone, seul le nom de l'outil reste affiché (le reste est lu par les lecteurs d'écran) :
      la place libérée va au clavier, qui prend toute la largeur de l'écran */
-  .toolbox__quip,
-  .toolbox__used,
-  .toolbox__cat {
+  .toolbox__quip {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -3019,7 +2948,6 @@ button.quick-link:active {
   .btn:active,
   .chip-btn:active,
   .icon-btn:active,
-  .legend__item:active,
   .menu-toggle:active,
   .theme-toggle:active,
   .badge:active,
@@ -3027,27 +2955,6 @@ button.quick-link:active {
   .project-panel__close:active {
     transform: none;
   }
-}
-
-/* Couleurs des catégories, tons poudrés (identiques à src/data/skills.json, utilisées par le clavier 3D) :
-   aubergine, ardoise, vieux rose, lilas */
-[data-cat='prog'] {
-  --cat: #6a4766;
-}
-[data-cat='infra'] {
-  --cat: #5e6b85;
-}
-[data-cat='offensive'] {
-  --cat: #b07a86;
-}
-[data-cat='blue'] {
-  --cat: #8f86b3;
-}
-.legend__swatch[data-cat] {
-  background: var(--cat);
-}
-.toolbox__name[data-cat] {
-  color: color-mix(in srgb, var(--cat) 55%, var(--cat-base));
 }
 
 /* « Réduire la transparence » : surfaces pleines, sans flou */

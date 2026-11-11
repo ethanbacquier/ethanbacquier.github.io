@@ -131,6 +131,7 @@ function Scene() {
       nextLine: 0,
       nextDraw: 0,
       ready: false,
+      time: 0,
     }),
     [],
   );
@@ -166,10 +167,14 @@ function Scene() {
     };
   }, [camera, scene, fade]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     const cam = camera as THREE.PerspectiveCamera;
     const dt = Math.min(delta, 0.05);
-    const t = state.clock.elapsedTime;
+    // Horloge propre : R3F remet clock.elapsedTime à 0 quand le canevas sort de pause (frameloop « never »
+    // → « always »). Les échéances (clignement, saccades, terminal) restaient alors loin dans le futur :
+    // en remontant la page, les yeux restaient fermés.
+    s.time += delta;
+    const t = s.time;
     const now = performance.now();
 
     // 1. Emplacement courant à l'écran

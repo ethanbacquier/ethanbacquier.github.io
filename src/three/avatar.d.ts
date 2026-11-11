@@ -14,7 +14,7 @@ export type Avatar = {
   chest: THREE.Group;
   neck: THREE.Group;
   head: THREE.Group;
-  torso: THREE.Mesh;
+  torso: THREE.Object3D;
   eyes: THREE.Group[];
   arms: { L: Limb; R: Limb };
   legs: { L: Leg; R: Leg };
