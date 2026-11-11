@@ -436,7 +436,7 @@ Grille de tuiles en verre (`.tiles`, 4 colonnes, 2 sur mobile, `grid-auto-flow: 
 ### 10. Contact
 « Travaillons » / « ensemble » (police système 800, ~9vw, mot par mot, letter-spacing qui se resserre au scroll).
 - Gauche : formulaire Web3Forms : Nom*, Email*, Entreprise, Objet (Stage 170 h / Alternance B3 / Autre), Message*, honeypot caché. Validation native + messages en français. États : focus, erreur inline, envoi (spinner, bouton désactivé), succès « Message reçu, je te réponds vite ✓ », échec (message + mailto de secours). « Tes données servent uniquement à te répondre. » Sans JS : `action` HTTP vers Web3Forms avec redirection. Sans clé : mailto à la place du formulaire.
-- Droite : liens rapides (icône Solar + libellé + ↗ qui glisse) : Email (copier), LinkedIn, GitHub, TryHackMe, Hack The Box, Discord « tatoune » (copier), CV (désactivé « bientôt »).
+- Droite : liens rapides (icône Solar + libellé + ↗ qui glisse) : Email (copier ; **seulement avec le formulaire** depuis le 11/11 : sans clé, l'adresse est déjà dans le bloc « Écris-moi directement » à gauche), LinkedIn, GitHub, TryHackMe, Hack The Box, Discord « tatoune » (copier), CV (désactivé « bientôt »).
 
 ### 11. Footer
 Encart « Comment ce site est sécurisé » au-dessus (liste dans `Footer.tsx`, `SECURITY`) : uniquement ce qui est réellement en place (aucun tracker/cookie, polices et icônes auto-hébergées, CSP stricte, ligne Web3Forms seulement si `VITE_FORM_KEY`, lien `security.txt`). Ne pas y annoncer HSTS ou `frame-ancestors` tant que le site n'est pas hébergé avec `_headers`.

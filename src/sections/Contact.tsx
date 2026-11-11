@@ -216,14 +216,17 @@ export function Contact() {
           )}
 
           <ul className="quick-links" aria-label="Me retrouver">
-            <li>
-              <button type="button" className="quick-link" onClick={() => copyText(profile.email, 'Adresse copiée ✓')}>
-                <IconLetter aria-hidden="true" />
-                <span className="quick-link__label">E-mail</span>
-                <span className="quick-link__meta">copier</span>
-                <IconCopy className="arrow" aria-hidden="true" />
-              </button>
-            </li>
+            {/* E-mail : seulement avec le formulaire ; sans clé, l'adresse est déjà dans le bloc de gauche */}
+            {FORM_KEY ? (
+              <li>
+                <button type="button" className="quick-link" onClick={() => copyText(profile.email, 'Adresse copiée ✓')}>
+                  <IconLetter aria-hidden="true" />
+                  <span className="quick-link__label">E-mail</span>
+                  <span className="quick-link__meta">copier</span>
+                  <IconCopy className="arrow" aria-hidden="true" />
+                </button>
+              </li>
+            ) : null}
             <QuickLink href={profile.links.linkedin} label="LinkedIn" icon={<IconLinkedin aria-hidden="true" />} />
             <QuickLink href={profile.links.github} label="GitHub" icon={<IconGithub aria-hidden="true" />} />
             <QuickLink href={profile.links.tryhackme} label="TryHackMe" icon={<IconTHM aria-hidden="true" />} />
