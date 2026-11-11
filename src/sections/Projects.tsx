@@ -264,6 +264,8 @@ function ProjectPanel({
       className={`project-panel${project ? ' is-open' : ''}${more ? ' has-more' : ''}`}
       aria-labelledby="project-panel-title"
       aria-hidden={!project}
+      // La molette au-dessus de la fiche la fait défiler elle, pas la page (Lenis l'interceptait)
+      data-lenis-prevent=""
       tabIndex={-1}
       {...(!project ? { inert: '' } : {})}
       // Au doigt : balayer vers la gauche ou la droite change de projet
