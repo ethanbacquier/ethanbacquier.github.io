@@ -297,6 +297,7 @@ Structure suggérée :
 - Jetons `--glass` (cartes), `--glass-strong` (surfaces flottantes), `--glass-blur`, `--glass-edge`, `--glass-shine` (arête claire), `--float-shadow`, `--radius: 22px`.
 - **Surfaces flottantes** en verre : en-tête (avec un fondu sous la barre au lieu d'un trait), menu mobile, fiche projet, toast, onglet CV, info-bulles, modale des crédits (fond de page assombri et flouté derrière).
 - **Cartes du contenu** en verre (`.frame` / `.glass-card`) : « Ce que je fais », tuiles d'entraînement, calendrier, « Hors des cours », fiches projets, contact, alternance. Le cadre pointillé à équerres a disparu.
+- **Cartes du contenu sans flou** (11/11, Ethan trouvait le défilement pas assez fluide) : `--card-blur: none`, le flou `--glass-blur` reste réservé aux surfaces flottantes. Le fond (grille, lueurs) change à chaque image du défilement, donc chaque carte floutée était recalculée à chaque image : mesuré sans 3D, 40–45 ms par image dans Outils → Contact avec le flou, 17 ms sans. Différence visuelle quasi nulle (fond déjà très doux). Ne pas remettre de `backdrop-filter` sur une surface qui défile.
 - `prefers-reduced-transparency` et `prefers-contrast: more` : surfaces pleines, sans flou (contours nets en contraste élevé).
 
 ### Curseur
