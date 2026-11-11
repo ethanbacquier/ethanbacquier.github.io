@@ -180,19 +180,21 @@ Statuts possibles : « En cours », « Livré », « Projet d'école ».
    - Hera = application autour d'événements sportifs : des organisateurs publient des sessions (sport, niveau, lieu, horaires), les participants les rejoignent.
    - **`admin.hera-app`** (à Ethan) : panel d'administration en Vue 3 + Vue Router + Vite, branché sur l'API Hera (`api.hera-app.fr`, jetons JWT d'accès et de rafraîchissement). Connexion e-mail ou Google, rôles `owner` (organisateur) et `admin`, gestion des événements et des participants, modération des utilisateurs (score, rôle, suppression), des événements et des signalements, création de comptes, réinitialisation du mot de passe.
    - **`hera-connect`** (branche `garmin`) : prototype de connexion Garmin **basé sur le projet open source garmin-grafana** (licence BSD-3, crédité). Apports d'Ethan visibles : script d'export CSV des activités (`csvsimple/export.py`), correctifs pour l'erreur 404 de l'API Garmin, README en français. Ne jamais présenter garmin-grafana comme son code.
-   - Stack affichée : Vue 3, Vue Router, Vite, API REST (JWT), Python, Docker, InfluxDB, Grafana. Liens : site https://hera-app.fr + organisation https://github.com/Hera-app (repos privés : pas de lien vers un repo). Plus de note « Fiche détaillée bientôt ».
+   - Stack affichée : Vue 3, Vue Router, Vite, API REST (JWT), Python, Docker, InfluxDB, Grafana. **Projet arrêté (11/11)** : hera-app.fr n'est plus joignable et les repos sont privés → aucun lien, note « Projet arrêté : le site n'est plus en ligne et le code reste privé. »
    - L'ancien portfolio parlait de « chat temps réel / WebSockets » : **rien de tel dans ces deux repos**, ne pas le reprendre.
 2. **Site du cabinet infirmier de Jassans-Riottier** — vrai client. Site vitrine statique HTML/CSS/JS (fichiers séparés, sans framework) pour un cabinet d'infirmières libérales : infos pratiques et contact, aux couleurs de leur carte de visite, contenus validés par le cabinet. **En ligne depuis fin octobre 2026** : https://cabinet-infirmier-jassans.fr (hébergement OVH, domaine, `.htaccess` avec HTTPS forcé, HSTS et CSP stricte, aucun formulaire ni donnée collectée), statut « Livré » depuis le 01/11. Fiche réécrite d'après le CLAUDE.md du repo `zTatoune/cabinet-infirmier-jassans` (5 infirmières libérales ; ne jamais y ajouter d'avis de patients).
 3. **Refonte du site du VBVB** (Volley Ball Villefranche Beaujolais) — statut **« En cours »**. Ethan refait le site de son propre club (actuellement sous WordPress) : actus, équipes, inscriptions, formation, beach, partenaires. Stack = `null` (masquée). Lien https://vbvb.fr uniquement en « site actuel », jamais comme réalisation.
 4. **Power 4 Web** — Projet d'école. Puissance 4 dans le navigateur, serveur Go (`net/http`), interface HTML/CSS, 3 difficultés (Normal 6×7, Difficile 6×9, Expert 7×8), noms de joueurs personnalisables. GitHub : https://github.com/zTatoune/-power4-web (ignorer le repo privé `-power4-webbbbb`).
 5. **RedQuest** — Projet d'école. RPG jouable dans le terminal, en Go : création de perso (nom, classe, compétences, équipement), boutique, combats contre des gobelins et autres monstres, gestion du mana et des ressources. GitHub : https://github.com/zTatoune/Projet_Red
 6. **ArmoniK** (Groupie Tracker) — publié le 31/10. Repo `Lyon-Ynov-Campus/groupie-tracker-gp-armonik`, 4 étudiants, Go + SQLite + WebSocket + API Deezer (blind test, petit bac musical). Commits d'Ethan (12/12/2025) : système de salles (`CodeRandom`, tables `rooms` / `rooms_users`, salle d'attente, WebSocket de la salle).
-7. **YSentinelle** — publié le 31/10. Repo `YSentinelle/app`, challenge 48 h (équipes data, dev, infra : indice pollution × météo sur carte). Commits d'Ethan (branche `BaEthan`) : `dataApi.js` (client Node.js de l'API data) et `syncDataWorker.js` (synchro toutes les 5 min). Projet d'école (confirmé le 31/10).
+7. **YSentinelle** — **retiré du site le 11/11** (demande d'Ethan), entrée supprimée de `projects.json`. Ne pas le remettre.
 8. **EscapeQuizz** — publié le 31/10. Repo `guiarthur7/EscapeQuizz`, Java / JavaFX. Commits d'Ethan : `QuizzController` (5 bonnes réponses d'affilée, score) et `TriviaService` (Open Trivia DB, 3 tentatives, délai). Ne pas nommer la personne réelle évoquée dans les dialogues du jeu.
 9. **CineList** — repo `guiarthur7/CineList` : un seul commit d'Ethan (une ligne de README). `draft: true`, rien à montrer.
 
 Power 4 Web et RedQuest : **projets solo** (confirmé par Ethan le 31/10). VBVB : stack lue dans son repo `zTatoune/vbvb` (React, TypeScript, Vite, React Router, GSAP).
 Hera : Ethan **n'a pas codé l'API** ; il a suivi sa création et s'en est servi pour le panel (31/10).
+
+**Repos publics des projets (11/11)** : Power 4 Web, RedQuest, Loldle, ArmoniK et EscapeQuizz sont publics. README de Power 4, RedQuest et Loldle réécrits pour qu'un visiteur lance le projet en local (Loldle : tables et 170 champions créés automatiquement au premier lancement, `data/champions.json`, `.env.example`). ArmoniK et EscapeQuizz : pas de droit d'écriture (repos d'Ynov et de guiarthur7) ; EscapeQuizz ne se lance pas tel quel (`mainClass` du `pom.xml` pointe vers `com.example.javaquizz` au lieu de `com.example.escapequizzz`).
 
 Pour 6 à 9 : avant de passer `draft` à `false`, lire le code et **les commits d'Ethan** (`git log --author`) et ne décrire que ce qu'il a réellement fait. Rôle en une phrase factuelle.
 
@@ -628,7 +630,7 @@ Repo de profil `zTatoune/zTatoune` (README affiché sur github.com/zTatoune) : *
 - [ ] Plus tard, facultatif : domaine perso `ethanbacquier.fr`
 - [ ] Mettre à jour `training.json` de temps en temps
 - [ ] Badges TryHackMe à jour (demandés le 31/10) : impossible depuis le conteneur cloud, tryhackme.com n'est pas dans les domaines autorisés du réseau de l'environnement
-- ArmoniK, YSentinelle, EscapeQuizz : Ethan ne se souvient plus de sa part (31/10) → on décrit seulement le projet, `role` et `learned` à `null`. YSentinelle = projet d'école confirmé (challenge 48 h à Ynov).
+- ArmoniK, EscapeQuizz : Ethan ne se souvient plus de sa part (31/10) → on décrit seulement le projet, `role` et `learned` à `null`.
 - [ ] Stack du site VBVB ; lien live du cabinet quand il est en ligne
 - [ ] Demander de vrais témoignages (prof Ynov, coach de volley, cabinet infirmier) avec accord de publication → `testimonials.json`
 - [ ] Monter un homelab (puis on pourra l'ajouter au site)
