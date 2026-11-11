@@ -58,6 +58,7 @@ h1 { font-size: 22pt; font-weight: 800; letter-spacing: -0.02em; line-height: 1.
 .detail { color: #333; }
 .contact { margin-top: 1.6mm; color: #222; }
 .contact span + span::before { content: ' · '; }
+.contact a, .sub a { color: #1a4fb8; text-decoration: underline; text-underline-offset: 1.5px; }
 section { margin-top: 2.5mm; }
 h2 { font-size: 10pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 0.6pt solid #999; padding-bottom: 0.8mm; margin-bottom: 1.6mm; }
 .entry + .entry { margin-top: 1.5mm; }
@@ -78,11 +79,11 @@ b { font-weight: 700; }
 ${section('Profil', `<p>${esc(data.profile)}</p>`)}
 ${section('Formation', data.education.map((e) => entry(esc(e.title), e.date, esc(e.place), e.text)).join(''))}
 ${section('Projets', data.projects.map((p) => entry(
-    `${esc(p.name)} <span class="sub">· ${esc(p.meta)}${p.link ? ` · ${link({ label: p.link, href: `https://${p.link}` })}` : ''}</span>`,
+    `${esc(p.role)} <span class="sub">· ${esc(p.name)} · ${esc(p.meta)}${p.link ? ` · ${link({ label: p.link, href: `https://${p.link}` })}` : ''}</span>`,
     null, null, `${p.text} Technologies : ${p.stack.replaceAll(' · ', ', ')}.`)).join(''))}
 ${section('Expérience', data.experience.map((e) => entry(esc(e.title), e.date, esc(e.place), e.text)).join(''))}
-${section('Compétences', `<div class="skills">${data.skills.map((s) => `<p><b>${esc(s.group)} :</b> ${esc(s.items)}</p>`).join('')}</div>`)}
 ${section('Entraînement et certifications', `<div class="plain">${data.training.map((t) => `<p><b>${esc(t.name)} :</b> ${esc([t.big, t.text].filter(Boolean).join(' · '))}</p>`).join('')}</div>`)}
+${section('Compétences', `<div class="skills">${data.skills.map((s) => `<p><b>${esc(s.group)} :</b> ${esc(s.items)}</p>`).join('')}</div>`)}
 ${section('Langues', `<p>${data.languages.map((l) => `${esc(l.name)} (${esc(l.level)})`).join(' · ')}</p>`)}
 ${section("Centres d'intérêt", `<p>${data.interests.map(esc).join(' · ')}</p>`)}
 </body></html>`;
@@ -130,7 +131,9 @@ h3 { font-size: 9.9pt; font-weight: 700; letter-spacing: -0.01em; line-height: 1
 .meta { font-size: 7.8pt; font-weight: 600; color: var(--accent); white-space: nowrap; }
 .project p { margin-top: 0.8mm; }
 .stack { color: var(--muted); font-size: 8pt; margin-top: 1mm !important; }
-.stack a { color: var(--accent); font-weight: 600; }
+.pname { font-weight: 600; color: var(--muted); font-size: 8.4pt; margin-top: 0.2mm !important; }
+.pname a { white-space: nowrap; }
+.pname a, .contact a { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); text-underline-offset: 1.5px; }
 .item { position: relative; padding-left: 4mm; }
 .item::before { content: ''; position: absolute; left: 0; top: 1.5mm; width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--accent); }
 .item::after { content: ''; position: absolute; left: 0.7mm; top: 3.6mm; bottom: -2.4mm; width: 0.3mm; background: var(--line); }
@@ -177,16 +180,16 @@ aside { background: var(--card); border: 0.6pt solid var(--edge); border-radius:
 <div class="grid">
 <main>
   <section>${head('Profil')}<p class="profile">${esc(data.profile)}</p></section>
-  <section>${head('Entraînement')}<div class="tiles">${data.training.map((t) => `
-    <div class="tile"><span class="tile__name">${esc(t.name)}</span><strong${t.big.length > 10 ? ' class="small"' : ''}>${esc(t.big)}</strong>${t.text ? `<span class="tile__text">${esc(t.text)}</span>` : ''}</div>`).join('')}</div></section>
   <section>${head('Projets')}${data.projects.map((p) => `
     <div class="project">
-      <div class="row"><h3>${esc(p.name)}</h3><span class="meta">${esc(p.meta)}</span></div>
+      <div class="row"><h3>${esc(p.role)}</h3><span class="meta">${esc(p.meta)}</span></div>
+      <p class="pname">${esc(p.name)}${p.link ? ` · <a href="https://${esc(p.link)}">${esc(p.link)} ↗</a>` : ''}</p>
       <p>${esc(p.text)}</p>
-      <p class="stack">${esc(p.stack)}${p.link ? ` · <a href="https://${esc(p.link)}">${esc(p.link)}</a>` : ''}</p>
     </div>`).join('')}</section>
   <section>${head('Expérience')}<div class="exp">${data.experience.map((e) => `
     <div class="tile"><span class="date">${esc(e.date)}</span><h3>${esc(e.title)}</h3><p class="sub">${esc(e.place)}</p><p>${esc(e.text)}</p></div>`).join('')}</div></section>
+  <section>${head('Entraînement')}<div class="tiles">${data.training.map((t) => `
+    <div class="tile"><span class="tile__name">${esc(t.name)}</span><strong${t.big.length > 10 ? ' class="small"' : ''}>${esc(t.big)}</strong>${t.text ? `<span class="tile__text">${esc(t.text)}</span>` : ''}</div>`).join('')}</div></section>
 </main>
 <aside>
   <section>${head('Contact')}<ul class="contact">${contactItems(data.contact)

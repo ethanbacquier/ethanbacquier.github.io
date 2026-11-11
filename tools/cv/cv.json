@@ -49,13 +49,15 @@
   ],
   "projects": [
     {
-      "name": "Site du cabinet infirmier de Jassans-Riottier",
+      "role": "Développeur web & déploiement",
+      "name": "Cabinet infirmier de Jassans-Riottier",
       "meta": "Client réel · livré",
       "link": "cabinet-infirmier-jassans.fr",
       "text": "Conception, développement et mise en ligne du site vitrine d'un cabinet de cinq infirmières libérales : hébergement, nom de domaine, HTTPS forcé, HSTS, CSP stricte, aucune donnée collectée.",
       "stack": "HTML · CSS · JavaScript · OVH"
     },
     {
+      "role": "Développeur du panel d'administration",
       "name": "Hera",
       "meta": "Projet d'école en groupe",
       "link": null,
@@ -63,6 +65,7 @@
       "stack": "Vue 3 · API REST (JWT) · Python · Docker · InfluxDB · Grafana"
     },
     {
+      "role": "Développeur web & sécurisation",
       "name": "Portfolio",
       "meta": "Projet personnel",
       "link": "ethanbacquier.github.io",
@@ -70,6 +73,7 @@
       "stack": "React · TypeScript · Three.js · GitHub Actions"
     },
     {
+      "role": "Développeur web bénévole",
       "name": "Refonte du site du VBVB",
       "meta": "En cours · mon club de volley",
       "link": null,
@@ -111,15 +115,15 @@
   "skills": [
     {
       "group": "Systèmes & réseau",
-      "items": "Linux, Windows, Windows Server, Active Directory, réseau TCP/IP, Docker, VirtualBox / VMware"
+      "items": "Linux, Windows Server, Active Directory, réseau TCP/IP, Docker"
     },
     {
       "group": "Sécurité",
-      "items": "Kali Linux, Nmap, Wireshark, Burp Suite, Metasploit, Gobuster, John / Hashcat, OSINT"
+      "items": "Kali Linux, Nmap, Wireshark, Burp Suite"
     },
     {
       "group": "Programmation",
-      "items": "Python, Go, Bash, C, SQL, HTML / CSS, JavaScript, Git, Claude Code"
+      "items": "Python, Bash, Git"
     }
   ],
   "languages": [
