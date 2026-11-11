@@ -602,7 +602,7 @@ object-src 'none';
 - **Écarté pour l'instant** (ne pas réintroduire sans demande) : rapports d'exercices détaillés (enquêtes type alerte → recherche → conclusion), bloc « En ce moment », statistiques de visite (le site reste **zéro tracker**), page sécurité dédiée (un encart suffit).
 
 ### Profil GitHub (11/11)
-Repo de profil `zTatoune/zTatoune` (README affiché sur github.com/zTatoune) : bannière fournie par Ethan (ville rouge et noir), animée en SVG, + terminal animé (que des commandes qu'il a vraiment lancées) et clavier d'outils. Ton détendu pour étudiants et devs, en français. Générateur : `tools/gen.py` dans ce repo.
+Repo de profil `zTatoune/zTatoune` (README affiché sur github.com/zTatoune) : **bannière seule** (demande d'Ethan : profil très bref), ville rouge et noir fournie par Ethan, agrandie 2x avec Real-ESRGAN et animée en SVG (fenêtres, feux, phrases tapées). Terminal, clavier, badges et texte retirés le 11/11. Propositions de photo de profil dans `pdp/`. Générateur : `tools/gen.py` dans ce repo.
 
 ## 17. TODO d'Ethan (mis à jour le 23 oct. 2026, après la mise en ligne)
 
