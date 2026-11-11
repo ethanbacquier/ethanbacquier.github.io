@@ -102,7 +102,7 @@ La clé Web3Forms est publique par conception : elle permet seulement d'envoyer 
 
 Le site est publié sur **GitHub Pages**, à l'adresse **https://ethanbacquier.github.io**. Le code vit dans le repo `ethanbacquier/ethanbacquier.github.io`, qui appartient à l'organisation GitHub gratuite `ethanbacquier`. Le workflow `.github/workflows/deploy.yml` construit et publie le site à chaque push sur `main`.
 
-L'ancien portfolio reste dans `TatouneYnov/portfolio`, sans changement.
+L'ancien portfolio reste dans `zTatoune/portfolio`, sans changement.
 
 ### Première mise en ligne (une seule fois)
 

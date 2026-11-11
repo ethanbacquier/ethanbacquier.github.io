@@ -8,7 +8,7 @@ Ce fichier est la référence du projet. Il reprend le brief initial **et** les 
 
 - **Environnement d'Ethan : Windows / PowerShell.** Jamais de chaînage `&&` dans les scripts npm, le README ou les instructions. Une commande par ligne.
 - **Mise en ligne** (autorisation durable d'Ethan, 30/10) : chaque correctif validé est poussé directement sur `v2`, `main` et le site (`ethanbacquier/ethanbacquier.github.io`, `main`) sans redemander, en avance rapide uniquement (jamais de force-push) ; si l'historique a divergé, fusionner d'abord.
-- **Git** : on travaille sur la branche `v2` du repo `TatouneYnov/portfolio`. Depuis le 23/10 (demande d'Ethan), `main` porte la v2 (avance rapide depuis `v2`) ; l'ancien portfolio (Vue) est conservé sur la branche `v1`, à ne pas toucher. Pas de force-push.
+- **Git** : on travaille sur la branche `v2` du repo `zTatoune/portfolio`. Depuis le 23/10 (demande d'Ethan), `main` porte la v2 (avance rapide depuis `v2`) ; l'ancien portfolio (Vue) est conservé sur la branche `v1`, à ne pas toucher. Pas de force-push.
 - **Skills à utiliser** : `build-awwwards-quality-sites` (système visuel et motion) et `frontend-design` (skill de design associé). Pour l'audit final : `seo-audit` (SEOmator) sur le site en ligne.
 - **Honnêteté absolue sur le contenu** : ne jamais inventer d'expérience, de certification, de stat, de client, de rôle ou de stack. Une info manquante est masquée ou remplacée par un état propre (« bientôt »), jamais affichée en « TODO », « lorem » ou lien `#`.
 - **Ethan n'a jamais fait l'École 42.** Ne pas le mentionner nulle part. Parcours = Ynov uniquement.
@@ -84,7 +84,7 @@ Fournir un `.env.example`. Ne jamais committer de `.env`.
 
 **Décidé avec Ethan le 23/10 : GitHub Pages, à l'adresse `https://ethanbacquier.github.io`. En ligne depuis le 23/10** (mise en place faite par Ethan ; premier déploiement vérifié : workflow « Déployer sur GitHub Pages » réussi sur le commit `0fbea73`, `npm audit` 0 vulnérabilité, contrôle du contenu OK).
 - Organisation GitHub gratuite **`ethanbacquier`** (créée par Ethan), repo public **`ethanbacquier/ethanbacquier.github.io`** : il reçoit le code de la v2 (`git push site v2:main`, voir README) et se déploie à chaque push sur `main` via `.github/workflows/deploy.yml` (actions officielles `configure-pages`, `upload-pages-artifact`, `deploy-pages`). Settings → Pages → Source : GitHub Actions.
-- **`TatouneYnov/portfolio`** : depuis le 23/10, `main` = la v2 ; l'ancien portfolio (Vue) est gardé intact sur la branche **`v1`**. On développe toujours sur `v2`, puis `main` est avancée sur `v2`.
+- **`zTatoune/portfolio`** : depuis le 23/10, `main` = la v2 ; l'ancien portfolio (Vue) est gardé intact sur la branche **`v1`**. On développe toujours sur `v2`, puis `main` est avancée sur `v2`.
 - Valeurs par défaut du build : `VITE_SITE_URL=https://ethanbacquier.github.io`, `VITE_BASE=/`. Pas de `CNAME` (adresse `github.io`). Variable de repo `FORM_KEY` pour Web3Forms : **pas encore créée** (build du 23/10 avec `VITE_FORM_KEY` vide → bloc mailto « Écris-moi directement » en ligne).
 - **Mettre à jour le site** : le site ne bouge pas tout seul quand on pousse sur `v2` ; il faut ensuite `git push site v2:main` (remote `site` = `ethanbacquier/ethanbacquier.github.io`).
 - Domaine perso (`ethanbacquier.fr`) : plus tard, facultatif (Settings → Pages → Custom domain + variable `SITE_URL`).
@@ -116,7 +116,7 @@ Tout le texte modifiable sans toucher au code.
 - Niveau (à respecter dans tous les textes) : bases solides en infra/cyber et plusieurs langages ; **pas encore de certification** ; ne jamais gonfler.
 - Email : `ethan.bacquier@gmail.com` (bouton copier + mailto)
 - Discord : `tatoune` (bouton « copier le pseudo », pas d'URL)
-- GitHub : https://github.com/TatouneYnov
+- GitHub : https://github.com/zTatoune (compte renommé `TatouneYnov` → `zTatoune` le 11/11 ; GitHub redirige les repos, pas l'ancienne page de profil)
 - LinkedIn : https://www.linkedin.com/in/ethan-bacquier
 - TryHackMe : https://tryhackme.com/p/.Tatoune
 - Hack The Box : https://app.hackthebox.com/users/2165775
@@ -182,21 +182,21 @@ Statuts possibles : « En cours », « Livré », « Projet d'école ».
    - **`hera-connect`** (branche `garmin`) : prototype de connexion Garmin **basé sur le projet open source garmin-grafana** (licence BSD-3, crédité). Apports d'Ethan visibles : script d'export CSV des activités (`csvsimple/export.py`), correctifs pour l'erreur 404 de l'API Garmin, README en français. Ne jamais présenter garmin-grafana comme son code.
    - Stack affichée : Vue 3, Vue Router, Vite, API REST (JWT), Python, Docker, InfluxDB, Grafana. Liens : site https://hera-app.fr + organisation https://github.com/Hera-app (repos privés : pas de lien vers un repo). Plus de note « Fiche détaillée bientôt ».
    - L'ancien portfolio parlait de « chat temps réel / WebSockets » : **rien de tel dans ces deux repos**, ne pas le reprendre.
-2. **Site du cabinet infirmier de Jassans-Riottier** — vrai client. Site vitrine statique HTML/CSS/JS (fichiers séparés, sans framework) pour un cabinet d'infirmières libérales : infos pratiques et contact, aux couleurs de leur carte de visite, contenus validés par le cabinet. **En ligne depuis fin octobre 2026** : https://cabinet-infirmier-jassans.fr (hébergement OVH, domaine, `.htaccess` avec HTTPS forcé, HSTS et CSP stricte, aucun formulaire ni donnée collectée), statut « Livré » depuis le 01/11. Fiche réécrite d'après le CLAUDE.md du repo `TatouneYnov/cabinet-infirmier-jassans` (5 infirmières libérales ; ne jamais y ajouter d'avis de patients).
+2. **Site du cabinet infirmier de Jassans-Riottier** — vrai client. Site vitrine statique HTML/CSS/JS (fichiers séparés, sans framework) pour un cabinet d'infirmières libérales : infos pratiques et contact, aux couleurs de leur carte de visite, contenus validés par le cabinet. **En ligne depuis fin octobre 2026** : https://cabinet-infirmier-jassans.fr (hébergement OVH, domaine, `.htaccess` avec HTTPS forcé, HSTS et CSP stricte, aucun formulaire ni donnée collectée), statut « Livré » depuis le 01/11. Fiche réécrite d'après le CLAUDE.md du repo `zTatoune/cabinet-infirmier-jassans` (5 infirmières libérales ; ne jamais y ajouter d'avis de patients).
 3. **Refonte du site du VBVB** (Volley Ball Villefranche Beaujolais) — statut **« En cours »**. Ethan refait le site de son propre club (actuellement sous WordPress) : actus, équipes, inscriptions, formation, beach, partenaires. Stack = `null` (masquée). Lien https://vbvb.fr uniquement en « site actuel », jamais comme réalisation.
-4. **Power 4 Web** — Projet d'école. Puissance 4 dans le navigateur, serveur Go (`net/http`), interface HTML/CSS, 3 difficultés (Normal 6×7, Difficile 6×9, Expert 7×8), noms de joueurs personnalisables. GitHub : https://github.com/TatouneYnov/-power4-web (ignorer le repo privé `-power4-webbbbb`).
-5. **RedQuest** — Projet d'école. RPG jouable dans le terminal, en Go : création de perso (nom, classe, compétences, équipement), boutique, combats contre des gobelins et autres monstres, gestion du mana et des ressources. GitHub : https://github.com/TatouneYnov/Projet_Red
+4. **Power 4 Web** — Projet d'école. Puissance 4 dans le navigateur, serveur Go (`net/http`), interface HTML/CSS, 3 difficultés (Normal 6×7, Difficile 6×9, Expert 7×8), noms de joueurs personnalisables. GitHub : https://github.com/zTatoune/-power4-web (ignorer le repo privé `-power4-webbbbb`).
+5. **RedQuest** — Projet d'école. RPG jouable dans le terminal, en Go : création de perso (nom, classe, compétences, équipement), boutique, combats contre des gobelins et autres monstres, gestion du mana et des ressources. GitHub : https://github.com/zTatoune/Projet_Red
 6. **ArmoniK** (Groupie Tracker) — publié le 31/10. Repo `Lyon-Ynov-Campus/groupie-tracker-gp-armonik`, 4 étudiants, Go + SQLite + WebSocket + API Deezer (blind test, petit bac musical). Commits d'Ethan (12/12/2025) : système de salles (`CodeRandom`, tables `rooms` / `rooms_users`, salle d'attente, WebSocket de la salle).
 7. **YSentinelle** — publié le 31/10. Repo `YSentinelle/app`, challenge 48 h (équipes data, dev, infra : indice pollution × météo sur carte). Commits d'Ethan (branche `BaEthan`) : `dataApi.js` (client Node.js de l'API data) et `syncDataWorker.js` (synchro toutes les 5 min). Projet d'école (confirmé le 31/10).
 8. **EscapeQuizz** — publié le 31/10. Repo `guiarthur7/EscapeQuizz`, Java / JavaFX. Commits d'Ethan : `QuizzController` (5 bonnes réponses d'affilée, score) et `TriviaService` (Open Trivia DB, 3 tentatives, délai). Ne pas nommer la personne réelle évoquée dans les dialogues du jeu.
 9. **CineList** — repo `guiarthur7/CineList` : un seul commit d'Ethan (une ligne de README). `draft: true`, rien à montrer.
 
-Power 4 Web et RedQuest : **projets solo** (confirmé par Ethan le 31/10). VBVB : stack lue dans son repo `TatouneYnov/vbvb` (React, TypeScript, Vite, React Router, GSAP).
+Power 4 Web et RedQuest : **projets solo** (confirmé par Ethan le 31/10). VBVB : stack lue dans son repo `zTatoune/vbvb` (React, TypeScript, Vite, React Router, GSAP).
 Hera : Ethan **n'a pas codé l'API** ; il a suivi sa création et s'en est servi pour le panel (31/10).
 
 Pour 6 à 9 : avant de passer `draft` à `false`, lire le code et **les commits d'Ethan** (`git log --author`) et ne décrire que ce qu'il a réellement fait. Rôle en une phrase factuelle.
 
-**Loldle** (repo `TatouneYnov/Scalingo`, publié le 01/11 sous le nom demandé par Ethan) : jeu de devinettes de champions League of Legends inspiré de Loldle, Node/Express + PostgreSQL + JWT/bcrypt, modes illimité et défi du jour, comptes, classements ; projet solo (34 commits). Projet d'école (confirmé par Ethan le 01/11), contexte « Ynov · projet solo ».
+**Loldle** (repo `zTatoune/Scalingo`, publié le 01/11 sous le nom demandé par Ethan) : jeu de devinettes de champions League of Legends inspiré de Loldle, Node/Express + PostgreSQL + JWT/bcrypt, modes illimité et défi du jour, comptes, classements ; projet solo (34 commits). Projet d'école (confirmé par Ethan le 01/11), contexte « Ynov · projet solo ».
 Regardés le 31/10, non retenus : `biblio-groupe-15` (gestion de bibliothèque en Python/SQLite, groupe de 4 ; seul commit d'Ethan : l'ADR « requêtes SQL paramétrées » contre l'injection SQL), `togethapp` (app mobile React Native/Expo + Supabase : village tower defense coopératif à 2, compagnon type Tamagotchi, mini-jeux ; repo privé, 1 commit).
 Ne **pas** utiliser : `tp-template-golang`, `algo-projet`, `ynov_2025_bachelor_1`, `exam-git-avanc-*` (non retenus par Ethan).
 
@@ -600,6 +600,9 @@ object-src 'none';
 ### Pistes examinées le 17/10 (grill « améliorations »)
 - **Fait** : « Utilisé : … » sur les touches, boutons du hero, alternance B3 mise en avant, « Ce que j'ai appris », encart sécurité, emplacement témoignages.
 - **Écarté pour l'instant** (ne pas réintroduire sans demande) : rapports d'exercices détaillés (enquêtes type alerte → recherche → conclusion), bloc « En ce moment », statistiques de visite (le site reste **zéro tracker**), page sécurité dédiée (un encart suffit).
+
+### Profil GitHub (11/11)
+Repo de profil `zTatoune/zTatoune` (README affiché sur github.com/zTatoune) : bannière fournie par Ethan (ville rouge et noir), animée en SVG, + terminal animé (que des commandes qu'il a vraiment lancées) et clavier d'outils. Ton détendu pour étudiants et devs, en français. Générateur : `tools/gen.py` dans ce repo.
 
 ## 17. TODO d'Ethan (mis à jour le 23 oct. 2026, après la mise en ligne)
 
