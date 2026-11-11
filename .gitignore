@@ -34,3 +34,4 @@ dist-ssr/
 
 # Photos brutes (ne jamais publier)
 assets-src/
+tools/cv/.build/

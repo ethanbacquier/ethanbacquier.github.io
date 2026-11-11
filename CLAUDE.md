@@ -75,6 +75,7 @@ Fournir un `.env.example`. Ne jamais committer de `.env`.
 | `scripts/check-content.mjs` | Échoue si TODO, lorem, valeur technique, lien vide, téléphone, École 42 ou espace normale devant « : ; ? ! » dans la page |
 | `scripts/typo.mjs` | Espaces insécables de la typographie française (JSON du contenu et pages annexes, à la compilation) |
 | `scripts/gen-keycap-icons.mjs` | Logos blancs des touches (`src/generated/keycap-icons.json`) |
+| `scripts/gen-cv.mjs` + `tools/cv/cv.json` | CV en PDF (5 versions, `npm run cv`) |
 | `scripts/gen-cursors.mjs` | Curseurs du site (`public/cursors/`, sources dans `tools/cursors/`) |
 | `tools/poster.html`, `tools/og.html` | Rendus des images fixes de l'avatar et de l'image Open Graph (via `npm run dev`) |
 
@@ -122,7 +123,7 @@ Tout le texte modifiable sans toucher au code.
 - Hack The Box : https://app.hackthebox.com/users/2165775
 - Instagram : https://www.instagram.com/ethan.bcqr/ → **uniquement** dans le bloc « Hors des cours » (ex-« Hors écran », renommé le 11/11)
 - Téléphone : **aucun**
-- CV : `public/cv/ethan-bacquier-cv.pdf`, champ `cv.available: false` → bouton désactivé « CV · bientôt dispo » (`aria-disabled="true"`, pas de lien). Passer à `true` suffit à l'activer.
+- CV : `public/cv/ethan-bacquier-cv.pdf`, `cv.available: true` depuis le 11/11 (bouton actif). **CV fait le 11/11** (grill avec Ethan) : source unique `tools/cv/cv.json`, généré par `npm run cv` (`scripts/gen-cv.mjs`, Playwright, police Inter embarquée). 5 PDF d'une page : 2 styles (ATS sobre une colonne / assorti au site, clair lavande) × accroches stage et alternance dans `cv/`, + version site (stage + alternance, style site) dans `public/cv/`. Coordonnées : e-mail, Lyon, site, LinkedIn, GitHub, **sans téléphone**. Projets : cabinet infirmier, Hera, portfolio, VBVB ; entraînement THM / HTB. Infos données par Ethan pour le CV : anglais B1 ; bac STI2D option SIN (2025, lycée avec pôle sportif) ; jeune coach UNSS jusqu'au championnat de France (2023–2024) ; stage de 3e au VBVB avec un entraîneur du club (2022). Né en 2007 (pas d'âge sur le CV).
 - Photo volley : champ `offscreen.photo` (`null` → carte texte seule).
 
 ### 4.2 timeline.json (Ynov uniquement)
@@ -616,7 +617,7 @@ Repo de profil `zTatoune/zTatoune` (README affiché sur github.com/zTatoune) : *
 - [ ] Ajouter ses vacances Ynov de mars à juin 2027 dans `availability.json`
 - [ ] Photo de volley (`volley.webp`)
 - [ ] Captures des projets (16:10)
-- [ ] CV PDF puis `cv.available: true` (un ancien `CV_Bacquier_Ethan.pdf` existe sur la branche `v1` (ancien portfolio) : à vérifier avant de le réutiliser)
+- [x] CV PDF puis `cv.available: true` — **fait le 11/11** (`npm run cv`, voir §4.1)
 - [ ] Créer une clé Web3Forms (`VITE_FORM_KEY`)
 - [x] Créer l'organisation GitHub gratuite `ethanbacquier`, le repo public `ethanbacquier.github.io`, activer Pages (source : GitHub Actions), puis `git push site v2:main` — **fait le 23/10, site en ligne**
 - [ ] Ouvrir https://ethanbacquier.github.io sur PC et sur téléphone pour un dernier coup d'œil (vérifié côté GitHub, pas affichable depuis le conteneur cloud)

@@ -78,9 +78,29 @@ Tout le texte vit dans `src/data/`. Règle commune : une valeur à `null` est ma
 
 | Quoi | Où le mettre | Et ensuite |
 |---|---|---|
-| CV | `public/cv/ethan-bacquier-cv.pdf` | dans `profile.json`, `"cv": { "available": true, … }` |
+| CV | généré, voir « Modifier le CV » ci-dessous | déjà activé (`"cv": { "available": true, … }`) |
 | Photo de volley (4:5) | `public/assets/about/volley.webp` | dans `profile.json`, `"offscreen": { "photo": "assets/about/volley.webp", … }` |
 | Capture d'un projet | `public/assets/projects/…` | champ `image` du projet |
+
+### Modifier le CV
+
+Le texte du CV est dans `tools/cv/cv.json` (une seule source). Après une modification :
+
+```
+npm run cv
+```
+
+Le script (Playwright) produit 5 PDF d'une page :
+
+| Fichier | Style | Accroche |
+|---|---|---|
+| `public/cv/ethan-bacquier-cv.pdf` | assorti au site | stage + alternance (bouton « CV » du site) |
+| `cv/ethan-bacquier-cv-stage.pdf` | assorti au site | stage de 170 h |
+| `cv/ethan-bacquier-cv-alternance.pdf` | assorti au site | alternance B3 |
+| `cv/ethan-bacquier-cv-ats-stage.pdf` | sobre, lisible par les logiciels de tri (ATS) | stage de 170 h |
+| `cv/ethan-bacquier-cv-ats-alternance.pdf` | sobre (ATS) | alternance B3 |
+
+Un avertissement s'affiche si une version dépasse une page A4 : raccourcis alors un texte.
 
 ---
 
