@@ -58,7 +58,7 @@
     {
       "name": "Hera",
       "meta": "Projet d'école en groupe",
-      "link": "hera-app.fr",
+      "link": null,
       "text": "Panel d'administration branché sur l'API REST du projet (jetons JWT) : connexion e-mail ou Google, rôles organisateur et admin, modération des utilisateurs, des événements et des signalements. Prototype de connexion Garmin basé sur le projet open source garmin-grafana.",
       "stack": "Vue 3 · API REST (JWT) · Python · Docker · InfluxDB · Grafana"
     },
