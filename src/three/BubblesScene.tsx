@@ -12,6 +12,7 @@ import type { DockRequest } from '../sections/Projects';
 import { markWebGLLost } from '../lib/capabilities';
 import { useTheme } from '../lib/theme';
 import { Warmup } from './Warmup';
+import { AdaptiveDpr } from './AdaptiveDpr';
 import { makeWalnutTexture } from './walnut';
 
 type Props = {
@@ -754,6 +755,7 @@ export default function BubblesScene(props: Props) {
       <Physics gravity={[0, 0, 0]} paused={paused} timeStep="vary">
         <World projects={list} {...rest} />
       </Physics>
+      <AdaptiveDpr max={dpr} min={1} />
     </Canvas>
   );
 }

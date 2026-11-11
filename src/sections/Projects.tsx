@@ -31,7 +31,9 @@ export function Projects() {
   const nearView = useInView(root, '100% 0px', true);
   const idleMount = useIdleMount(1);
   const near = nearView || idleMount;
-  const visible = useInView(root, '0px');
+  // Bulles figées (physique et rendu) dès que leur scène est hors de l'écran ou presque :
+  // moins de 10 % de la scène visible, on ne voit plus les bulles, inutile de les faire bouger
+  const [visible, setVisible] = useState(false);
   const [use3D, setUse3D] = useState(false);
   const [docked, setDocked] = useState<string | null>(null);
   const [request, setRequest] = useState<DockRequest>(null);
@@ -95,6 +97,15 @@ export function Projects() {
 
   const current = projects.find((p) => p.id === docked) ?? null;
   const show3D = mounted && use3D;
+  useEffect(() => {
+    const el = stage.current;
+    if (!show3D || !el) return;
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting && e.intersectionRatio >= 0.1), {
+      threshold: [0, 0.1, 0.2],
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [show3D]);
 
   // Titre posé sur la scène : sa hauteur (depuis le haut de la scène) sert de plafond aux bulles
   useEffect(() => {

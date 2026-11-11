@@ -10,6 +10,7 @@ import { stageState } from '../lib/stageState';
 import { markWebGLLost } from '../lib/capabilities';
 import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
+import { AdaptiveDpr } from './AdaptiveDpr';
 
 type Rect = { x: number; y: number; w: number; h: number };
 type Framing = { center: THREE.Vector3; height: number; width: number; dir: THREE.Vector3 };
@@ -451,6 +452,7 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
         }}
       >
         <Scene />
+        <AdaptiveDpr max={dpr} min={1} />
         <ClearWhenPaused active={pageVisible && slotVisible} />
       </Canvas>
     </div>
