@@ -3,6 +3,7 @@ import IconMenu from '~icons/solar/hamburger-menu-linear';
 import IconClose from '~icons/solar/close-linear';
 import IconSun from '~icons/solar/sun-2-linear';
 import IconMoon from '~icons/solar/moon-linear';
+import IconDownload from '~icons/solar/download-linear';
 import { flushSync } from 'react-dom';
 import profile from '../data/profile.json';
 import { copyText } from '../lib/toast';
@@ -192,8 +193,9 @@ export function Header() {
       </div>
 
       {profile.cv.available ? (
-        <a className="cv-tab" href={asset(profile.cv.path)} download>
-          CV
+        <a className="cv-tab" href={asset(profile.cv.path)} download aria-label="Télécharger mon CV (PDF)">
+          <IconDownload aria-hidden="true" />
+          Mon CV
         </a>
       ) : (
         <span className="cv-tab cv-tab--off" aria-disabled="true">

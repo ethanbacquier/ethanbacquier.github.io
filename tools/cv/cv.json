@@ -100,16 +100,16 @@
   ],
   "experience": [
     {
-      "title": "Jeune coach UNSS",
-      "place": "Lycée, pôle sportif",
-      "date": "2023–2024",
-      "text": "Coach d'équipe en compétition UNSS, jusqu'au championnat de France."
-    },
-    {
       "title": "Stage d'observation de 3e",
       "place": "Volley Ball Villefranche Beaujolais",
       "date": "2022",
       "text": "Stage aux côtés d'un entraîneur du club."
+    },
+    {
+      "title": "Jeune coach UNSS",
+      "place": "Lycée, pôle sportif",
+      "date": "2023–2024",
+      "text": "Coach d'équipe en compétition UNSS, jusqu'au championnat de France."
     }
   ],
   "skills": [
