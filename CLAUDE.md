@@ -373,7 +373,7 @@ Budget : qualité d'abord, optimisation après mesure sur le PC d'Ethan. **Refon
 Le contenu du hero glisse vers l'extérieur en fondu (scrub). Avatar à gauche, tête qui suit toujours. À droite :
 - Label « À PROPOS »
 - Paragraphe (~20 px, passe de `--muted` à `--text` mot à mot au défilement), raccourci le 11/11 à la demande d'Ethan (« plus simple et bref ») :
-  > Moi, c'est Ethan, étudiant en 2e année de cybersécurité à Ynov Lyon. Ce qui me plaît, c'est de comprendre comment un système fonctionne pour savoir le protéger. Je cherche un stage, puis une alternance pour ma 3e année.
+  > Moi, c'est Ethan, étudiant en 2e année de cybersécurité à Ynov Lyon. Ce qui me plaît, c'est de comprendre comment un système fonctionne pour savoir le protéger. J'aime aussi mettre les mains dans l'infra, parce qu'on défend mieux ce qu'on sait construire. Je cherche un stage, puis une alternance pour ma 3e année.
 - Bloc « Hors des cours » (titre « Hors écran » jusqu'au 11/11, Ethan le trouvait bizarre ; même style d'étiquette) : `volley.webp` (4:5, grayscale → couleur au survol) +
   > Libéro en Nationale 3 au Volley Ball Villefranche Beaujolais (VBVB). Lire le jeu, rester calme, jouer pour l'équipe : au fond, c'est le même métier.
 
