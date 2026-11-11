@@ -1,6 +1,7 @@
 {
   "_note": "Contenu du CV (source unique des 5 PDF). Après modification : node scripts/gen-cv.mjs. Ne mettre que du vrai : aucun téléphone, aucune adresse.",
   "name": "Ethan Bacquier",
+  "photo": "photo.jpg",
   "contact": {
     "email": "ethan.bacquier@gmail.com",
     "city": "Lyon",
@@ -21,8 +22,8 @@
     },
     "site": {
       "title": "Étudiant en B2 Cybersécurité",
-      "goal": "Recherche un stage de 170 h dès novembre 2026, puis une alternance en Bachelor 3",
-      "detail": "Stage : les matins en semaine (8h–12h) et à temps plein pendant les vacances · Alternance : rentrée 2027, 1 semaine à l'école / 2 semaines en entreprise · Lyon"
+      "goal": "Recherche un stage de 170 h dès nov. 2026, puis une alternance en B3",
+      "detail": "Stage : les matins (8h–12h) et à temps plein pendant les vacances · Alternance : rentrée 2027, 1 semaine à l'école / 2 en entreprise · Lyon"
     }
   },
   "profile": "Étudiant en 2e année de cybersécurité à Ynov Lyon. J'aime comprendre comment un système fonctionne pour savoir le protéger, et mettre les mains dans l'infra : on défend mieux ce qu'on sait construire.",

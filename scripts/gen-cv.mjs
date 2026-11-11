@@ -90,6 +90,7 @@ ${section("Centres d'intérêt", `<p>${data.interests.map(esc).join(' · ')}</p>
 
 /* ---------- Version portfolio : thème clair lavande du site ---------- */
 function portfolio(v) {
+  const photo = data.photo ? pathToFileURL(join(root, 'tools/cv', data.photo)).href : null;
   const head = (t) => `<h2>${esc(t)}</h2>`;
   const timeline = (list) => list.map((e) => `
     <div class="item">
@@ -107,10 +108,13 @@ body { position: relative; color: var(--text); background: var(--bg); font-size:
 .orb--b { width: 140mm; height: 140mm; right: -60mm; top: 70mm; background: radial-gradient(circle, rgb(255 190 160 / .38), transparent 68%); }
 .orb--c { width: 160mm; height: 160mm; left: 10mm; bottom: -90mm; background: radial-gradient(circle, rgb(150 160 235 / .32), transparent 68%); }
 header { display: flex; gap: 6mm; align-items: center; }
+header.with-photo { gap: 5.5mm; }
+.head { flex: 1; min-width: 0; }
+.photo { flex: none; width: 34mm; height: 34mm; border-radius: 50%; object-fit: cover; border: 1.2mm solid rgb(255 255 255 / .85); box-shadow: 0 1.5mm 5mm rgb(40 20 80 / .14); }
 .mono { flex: none; width: 17mm; height: 17mm; border-radius: 5.5mm; background: var(--text); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15pt; letter-spacing: -0.04em; }
 h1 { font-size: 27pt; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
 .title { font-size: 13pt; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); margin-top: 1.4mm; }
-.goal { margin-top: 4mm; background: var(--card); border: 0.6pt solid var(--edge); border-radius: 4mm; padding: 3mm 4.2mm; display: flex; gap: 3mm; align-items: flex-start; box-shadow: 0 1mm 4mm rgb(40 20 80 / .06); }
+.goal { margin-top: 3mm; background: var(--card); border: 0.6pt solid var(--edge); border-radius: 4mm; padding: 3mm 4.2mm; display: flex; gap: 3mm; align-items: flex-start; box-shadow: 0 1mm 4mm rgb(40 20 80 / .06); }
 .dot { flex: none; width: 2.4mm; height: 2.4mm; border-radius: 50%; background: #3FAF7A; margin-top: 1.4mm; box-shadow: 0 0 0 1mm rgb(63 175 122 / .18); }
 .goal strong { display: block; font-size: 10pt; font-weight: 700; letter-spacing: -0.01em; }
 .goal span { color: var(--muted); }
@@ -163,11 +167,13 @@ aside { background: var(--card); border: 0.6pt solid var(--edge); border-radius:
 .lang span { color: var(--muted); }
 </style></head><body>
 <div class="orb orb--a"></div><div class="orb orb--b"></div><div class="orb orb--c"></div>
-<header>
-  <div class="mono" aria-hidden="true">EB</div>
-  <div><h1>${esc(data.name)}</h1><p class="title">${esc(v.title)} · Ynov Lyon</p></div>
+<header${photo ? ' class="with-photo"' : ''}>
+  ${photo ? `<img class="photo" src="${photo}" alt="Photo d'Ethan Bacquier">` : '<div class="mono" aria-hidden="true">EB</div>'}
+  <div class="head">
+    <h1>${esc(data.name)}</h1><p class="title">${esc(v.title)} · Ynov Lyon</p>
+    <div class="goal"><i class="dot"></i><div><strong>${esc(v.goal)}</strong><span>${esc(v.detail)}</span></div></div>
+  </div>
 </header>
-<div class="goal"><i class="dot"></i><div><strong>${esc(v.goal)}</strong><span>${esc(v.detail)}</span></div></div>
 <div class="grid">
 <main>
   <section>${head('Profil')}<p class="profile">${esc(data.profile)}</p></section>
