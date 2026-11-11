@@ -22,11 +22,11 @@
         "Grafana"
       ],
       "learned": "Utiliser une API REST (jetons JWT) pour construire une interface d'administration, et gérer des comptes et leurs permissions.",
-      "note": null,
+      "note": "Projet arrêté : le site n'est plus en ligne et le code reste privé.",
       "links": {
         "github": null,
-        "organization": "https://github.com/Hera-app",
-        "live": "https://hera-app.fr",
+        "organization": null,
+        "live": null,
         "current": null
       },
       "image": null,
@@ -190,31 +190,6 @@
       "note": null,
       "links": {
         "github": "https://github.com/zTatoune/Scalingo",
-        "organization": null,
-        "live": null,
-        "current": null
-      },
-      "image": null,
-      "draft": false
-    },
-    {
-      "id": "ysentinelle",
-      "name": "YSentinelle",
-      "tagline": "Pollution et météo sur une carte, en 48 heures",
-      "bubbleLabel": "YSentinelle",
-      "size": 1,
-      "status": "Projet d'école",
-      "context": "Ynov · challenge 48 h, équipes data, dev et infra",
-      "description": "Un défi de 48 heures : croiser les données publiques de pollution et de météo, en tirer un indice et l'afficher sur une carte, le tout sur une infrastructure haute disponibilité.",
-      "role": null,
-      "stack": [
-        "Node.js",
-        "JavaScript"
-      ],
-      "learned": null,
-      "note": null,
-      "links": {
-        "github": "https://github.com/YSentinelle/app",
         "organization": null,
         "live": null,
         "current": null

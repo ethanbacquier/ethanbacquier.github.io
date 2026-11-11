@@ -27,7 +27,10 @@
   /* Matières translucides : on devine le contenu flouté dessous. Plus la surface est grande, plus elle est « épaisse » */
   --glass: color-mix(in srgb, var(--bg-2) 58%, transparent); /* cartes du contenu */
   --glass-strong: color-mix(in srgb, var(--bg-2) 78%, transparent); /* barres et surfaces flottantes */
-  --glass-blur: blur(24px) saturate(160%);
+  --glass-blur: blur(24px) saturate(160%); /* surfaces flottantes seulement (en-tête, menu, fiche, toast…) */
+  /* Cartes du contenu : pas de flou. Derrière elles, le fond (grille, lueurs) bouge à chaque image du défilement :
+     chaque carte floutée devait être recalculée à chaque image, et la page tombait à ~25 i/s (mesuré le 11/11) */
+  --card-blur: none;
   --glass-edge: color-mix(in srgb, var(--text) 12%, transparent);
   --glass-shine: inset 0 1px 0 rgb(255 255 255 / 0.07); /* arête claire : la lumière accroche le bord du verre */
   --float-shadow: 0 20px 60px -20px rgb(0 0 0 / 0.7);
@@ -563,8 +566,8 @@ main {
   border: 1px solid var(--glass-edge);
   border-radius: var(--radius);
   background: var(--glass);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
   box-shadow: var(--glass-shine), var(--card-shadow);
 }
 .frame__c {
@@ -1325,8 +1328,8 @@ textarea {
   border-radius: var(--radius);
   background: var(--glass);
   max-width: 560px;
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 .offscreen--photo {
   grid-template-columns: minmax(120px, 0.7fr) 1fr;
@@ -1623,8 +1626,8 @@ textarea {
   border-radius: 14px;
   background: var(--glass);
   transition: opacity 0.2s;
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 .skills-list__name {
   font-weight: 600;
@@ -2149,8 +2152,8 @@ textarea {
   box-shadow: var(--glass-shine), var(--card-shadow);
   border-radius: var(--radius);
   background: var(--glass);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 .project-card .project__head {
   padding-right: 0;
@@ -2212,8 +2215,8 @@ textarea {
   border-left: 3px solid var(--accent);
   border-radius: 16px;
   background: var(--glass);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 .dispo__alt-rhythm {
   font-family: var(--font-display);
@@ -2530,8 +2533,8 @@ html:not(.js) .cal__month caption {
   box-shadow: var(--glass-shine), var(--card-shadow);
   border-radius: var(--radius);
   background: var(--glass);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 .contact__direct-mail {
   font-family: var(--font-display);
@@ -2637,8 +2640,8 @@ button.quick-link:active {
   box-shadow: var(--glass-shine), var(--card-shadow);
   border-radius: var(--radius);
   background: var(--glass);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 .quote-card blockquote p {
   font-size: clamp(1.05rem, 1.4vw, 1.25rem);

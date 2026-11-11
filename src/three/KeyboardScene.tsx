@@ -258,8 +258,14 @@ function makeCapTexture(skill: Skill): THREE.CanvasTexture {
 type KeyRef = { group: THREE.Group; mat: THREE.MeshStandardMaterial; pressed: boolean };
 
 function Keyboard({ skills, active, press, onHover, scroll }: Omit<Props, 'paused' | 'onLost'>) {
-  const { size, camera } = useThree();
+  const { size, camera, invalidate } = useThree();
   const mobile = size.width < 640;
+  // Rendu à la demande : une image seulement quand quelque chose bouge (défilement, touche, onde)
+  const animUntil = useRef(0);
+  const animate = (seconds: number) => {
+    animUntil.current = Math.max(animUntil.current, performance.now() + seconds * 1000);
+    invalidate();
+  };
   const board = useRef<THREE.Group>(null);
   const keys = useRef<Map<string, KeyRef>>(new Map());
   const ripples = useRef<THREE.Mesh[]>([]);
@@ -355,6 +361,7 @@ function Keyboard({ skills, active, press, onHover, scroll }: Omit<Props, 'pause
     if (!k || k.pressed === down) return;
     k.pressed = down;
     gsap.killTweensOf(k.group.position);
+    animate(down ? 0.75 : 0.55);
     if (down) {
       gsap.to(k.group.position, { y: -0.14, duration: 0.12, ease: 'power2.out' });
       gsap.to(k.mat, { emissiveIntensity: 0.45, duration: 0.15 });
@@ -387,6 +394,20 @@ function Keyboard({ skills, active, press, onHover, scroll }: Omit<Props, 'pause
   useFrame(() => {
     if (board.current) board.current.rotation.y = turn.base + scroll.rotation * turn.swing;
   });
+
+  // Une nouvelle image tant qu'une animation tourne ou que la rotation liée au défilement change ;
+  // le reste du temps, le canevas garde sa dernière image (zéro calcul)
+  useEffect(() => {
+    let lastRotation = NaN;
+    const tick = () => {
+      if (scroll.rotation !== lastRotation || performance.now() < animUntil.current) {
+        lastRotation = scroll.rotation;
+        invalidate();
+      }
+    };
+    gsap.ticker.add(tick);
+    return () => gsap.ticker.remove(tick);
+  }, [scroll, invalidate]);
 
   return (
     <group ref={board} rotation={[0, turn.base, 0]}>
@@ -484,7 +505,7 @@ export default function KeyboardScene(props: Props) {
       dpr={dpr}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       camera={{ fov: 26, near: 0.1, far: 80, position: [0, 9, 8] }}
-      frameloop={paused ? 'never' : 'always'}
+      frameloop={paused ? 'never' : 'demand'}
       shadows
       onCreated={({ gl }) => {
         gl.domElement.addEventListener('webglcontextlost', (e) => {
