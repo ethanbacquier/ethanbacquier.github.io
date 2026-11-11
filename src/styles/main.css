@@ -1909,6 +1909,11 @@ textarea {
   transition: transform 0.3s var(--ease-in-out), opacity 0.24s ease 0.06s, visibility 0s linear 0.3s;
   will-change: transform, opacity;
 }
+/* La fiche est une colonne flex à hauteur limitée : sans ça, son contenu se tassait au lieu de défiler
+   (liens écrasés à quelques pixels, cachés sous le fondu) */
+.project-panel > * {
+  flex-shrink: 0;
+}
 .project-panel:focus {
   outline: none; /* focus posé par le code à l'ouverture ; les boutons gardent leur contour */
 }
@@ -2012,7 +2017,7 @@ textarea {
   justify-content: center;
   flex: none;
   height: 64px;
-  margin: -64px -28px -28px;
+  margin: -64px -28px 0; /* aucune place prise dans le flux : sinon la fiche « déborde » toujours de 28 px */
   padding-bottom: 10px;
   border-radius: 0 0 var(--radius) var(--radius);
   background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--bg-2) 96%, transparent) 70%);
