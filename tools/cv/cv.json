@@ -4,11 +4,14 @@
   "photo": "photo.jpg",
   "contact": {
     "email": "ethan.bacquier@gmail.com",
-    "city": "Lyon",
     "site": "ethanbacquier.github.io",
     "linkedin": "linkedin.com/in/ethan-bacquier",
     "github": "github.com/zTatoune"
   },
+  "practical": [
+    "Basé à Lyon",
+    "Permis B (voiture)"
+  ],
   "variants": {
     "stage": {
       "title": "Étudiant en B2 Cybersécurité",
@@ -57,6 +60,14 @@
       "stack": "HTML · CSS · JavaScript · OVH"
     },
     {
+      "role": "Développeur web bénévole",
+      "name": "Refonte du site du VBVB",
+      "meta": "En cours · mon club de volley",
+      "link": "test.vbvb.fr",
+      "text": "Nouveau site du Volley Ball Villefranche Beaujolais : actus, équipes, matchs, inscriptions. Pages pré-rendues pour le référencement.",
+      "stack": "React · TypeScript · Vite · GSAP"
+    },
+    {
       "role": "Développeur du panel d'administration",
       "name": "Hera",
       "meta": "Projet d'école en groupe",
@@ -71,14 +82,6 @@
       "link": "ethanbacquier.github.io",
       "text": "Site statique pré-rendu, lisible sans JavaScript : CSP stricte, aucun tracker ni cookie, déploiement automatique sur GitHub Pages.",
       "stack": "React · TypeScript · Three.js · GitHub Actions"
-    },
-    {
-      "role": "Développeur web bénévole",
-      "name": "Refonte du site du VBVB",
-      "meta": "En cours · mon club de volley",
-      "link": "test.vbvb.fr",
-      "text": "Nouveau site du Volley Ball Villefranche Beaujolais : actus, équipes, matchs, inscriptions. Pages pré-rendues pour le référencement.",
-      "stack": "React · TypeScript · Vite · GSAP"
     }
   ],
   "training": [

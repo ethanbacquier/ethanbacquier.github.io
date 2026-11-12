@@ -33,7 +33,6 @@ ul { list-style: none; }
 
 const contactItems = (c) => [
   { label: c.email, href: `mailto:${c.email}` },
-  { label: c.city },
   { label: c.site, href: `https://${c.site}` },
   { label: c.linkedin, href: `https://www.${c.linkedin}` },
   { label: c.github, href: `https://${c.github}` },
@@ -50,12 +49,13 @@ function ats(v) {
     </div>`;
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(data.name)} · CV</title>
 <style>${fontFace}
-body { color: #111; font-size: 9pt; line-height: 1.36; padding: 11mm 15mm 0; }
+body { color: #111; font-size: 9pt; line-height: 1.36; padding: 9mm 15mm 0; }
 header { border-bottom: 1.2pt solid #111; padding-bottom: 3.2mm; margin-bottom: 3.6mm; }
 h1 { font-size: 22pt; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
 .title { font-size: 11.5pt; font-weight: 600; margin-top: 1mm; }
 .goal { font-weight: 600; margin-top: 1.6mm; }
 .detail { color: #333; }
+.practical { color: #333; }
 .contact { margin-top: 1.6mm; color: #222; }
 .contact span + span::before { content: ' · '; }
 .contact a, .sub a { color: #1a4fb8; text-decoration: underline; text-underline-offset: 1.5px; }
@@ -74,6 +74,7 @@ b { font-weight: 700; }
   <p class="title">${esc(v.title)}</p>
   <p class="goal">${esc(v.goal)}</p>
   <p class="detail">${esc(v.detail)}</p>
+  <p class="practical">${data.practical.map(esc).join(' · ')}</p>
   <p class="contact">${contactItems(data.contact).map((it) => `<span>${link(it)}</span>`).join('')}</p>
 </header>
 ${section('Profil', `<p>${esc(data.profile)}</p>`)}
@@ -193,7 +194,8 @@ aside { background: var(--card); border: 0.6pt solid var(--edge); border-radius:
 </main>
 <aside>
   <section>${head('Contact')}<ul class="contact">${contactItems(data.contact)
-    .map((it) => `<li${it.href ? '' : ' class="city"'}>${link(it)}</li>`).join('')}</ul></section>
+    .map((it) => `<li>${link(it)}</li>`).join('')}</ul></section>
+  <section>${head('Infos pratiques')}<ul class="contact">${data.practical.map((i) => `<li class="city">${esc(i)}</li>`).join('')}</ul></section>
   <section>${head('Formation')}<div class="edu">${data.education.map((e) => `
     <div class="item"><span class="date">${esc(e.date)}</span><h3>${esc(e.title)}</h3><p class="sub">${esc(e.place)}</p>${e.text ? `<p>${esc(e.text)}</p>` : ''}</div>`).join('')}</div></section>
   <section>${head('Compétences')}${data.skills.map((s) => `
