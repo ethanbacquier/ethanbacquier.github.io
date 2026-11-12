@@ -247,6 +247,7 @@ Wireshark — « Je lis des paquets comme d'autres lisent des romans. » : rang�
   - 28 déc. 2026 – 1er janv. 2027 (1er janv. férié)
 - **Pas disponible du tout** (champ `unavailable`, état « pas dispo », chiffre grisé et barré, 12/11, demande d'Ethan) : 21–24 déc. 2026.
   - 8–12 févr. 2027
+- **À partir du 14 mai 2027 : « dispo à confirmer »** (champ `unknownFrom`, cercle pointillé, légende « À confirmer » ; 12/11, Ethan ne sait pas encore). Fériés et week-ends gardent leur état.
 - **Mars → juin 2027 : matinées uniquement** tant qu'Ethan n'a pas ajouté ses vacances Ynov (il les ajoutera dans le JSON).
 - Jours fériés à griser : 11 nov. 2026, 25 déc. 2026, 1er janv. 2027, 29 mars 2027 (lundi de Pâques), 6 mai 2027 (Ascension), 17 mai 2027 (lundi de Pentecôte). Les 1er et 8 mai 2027 tombent un samedi.
 - **Jours passés grisés automatiquement** (comparaison avec la date du visiteur) ; un mois entièrement passé disparaît de la vue.

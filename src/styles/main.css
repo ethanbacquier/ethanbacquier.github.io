@@ -2346,6 +2346,13 @@ html:not(.js) .cal__month caption {
   color: var(--bg);
   font-weight: 700;
 }
+/* À confirmer : chiffre normal, cercle pointillé, pas de point */
+.day--unknown .day__num {
+  color: var(--muted);
+  box-shadow: none;
+  outline: 1.5px dashed color-mix(in srgb, var(--muted) 55%, transparent);
+  outline-offset: -4px;
+}
 /* Pas dispo, férié, passé, week-end, hors période : grisé */
 .day--weekend .day__num,
 .day--off .day__num,
@@ -2406,6 +2413,9 @@ html:not(.js) .cal__month caption {
 }
 .cal__key--full {
   background: var(--accent);
+}
+.cal__key--unknown {
+  border: 1.5px dashed var(--muted);
 }
 .cal__key--off {
   background: var(--dim);
