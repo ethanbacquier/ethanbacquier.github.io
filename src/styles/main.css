@@ -2346,13 +2346,15 @@ html:not(.js) .cal__month caption {
   color: var(--bg);
   font-weight: 700;
 }
-/* Férié, passé, week-end, hors période : grisé */
+/* Pas dispo, férié, passé, week-end, hors période : grisé */
 .day--weekend .day__num,
+.day--off .day__num,
 .day--holiday .day__num,
 .day--past .day__num,
 .day--out .day__num {
   color: var(--dim);
 }
+.day--off .day__num,
 .day--holiday .day__num {
   text-decoration: line-through;
   text-decoration-color: color-mix(in srgb, var(--dim) 70%, transparent);

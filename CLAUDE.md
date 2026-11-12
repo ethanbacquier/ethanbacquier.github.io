@@ -244,7 +244,8 @@ Wireshark — « Je lis des paquets comme d'autres lisent des romans. » : rang�
 - Jours de semaine par défaut = **matin dispo (8h–12h)**.
 - **Semaines pleines (journée complète, 7 h)** connues :
   - 2–6 nov. 2026
-  - 21 déc. 2026 – 1er janv. 2027 (25 déc. et 1er janv. fériés)
+  - 28 déc. 2026 – 1er janv. 2027 (1er janv. férié)
+- **Pas disponible du tout** (champ `unavailable`, état « pas dispo », chiffre grisé et barré, 12/11, demande d'Ethan) : 21–24 déc. 2026.
   - 8–12 févr. 2027
 - **Mars → juin 2027 : matinées uniquement** tant qu'Ethan n'a pas ajouté ses vacances Ynov (il les ajoutera dans le JSON).
 - Jours fériés à griser : 11 nov. 2026, 25 déc. 2026, 1er janv. 2027, 29 mars 2027 (lundi de Pâques), 6 mai 2027 (Ascension), 17 mai 2027 (lundi de Pentecôte). Les 1er et 8 mai 2027 tombent un samedi.
@@ -262,9 +263,10 @@ Structure suggérée :
   "fullDayHours": 7,
   "fullWeeks": [
     { "from": "2026-11-02", "to": "2026-11-06" },
-    { "from": "2026-12-21", "to": "2027-01-01" },
+    { "from": "2026-12-28", "to": "2027-01-01" },
     { "from": "2027-02-08", "to": "2027-02-12" }
   ],
+  "unavailable": [{ "from": "2026-12-21", "to": "2026-12-24" }],
   "holidays": ["2026-11-11", "2026-12-25", "2027-01-01", "2027-03-29", "2027-05-06", "2027-05-17"],
   "location": "Lyon ou télétravail"
 }

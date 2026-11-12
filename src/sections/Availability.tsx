@@ -9,7 +9,7 @@ import { useMounted } from '../lib/hooks';
 import { project, rubberband, springTo, velocityTracker, type Spring } from '../lib/spring';
 import { SplitHeading } from '../components/SplitHeading';
 
-type DayState = 'morning' | 'full' | 'holiday' | 'weekend' | 'past' | 'out';
+type DayState = 'morning' | 'full' | 'off' | 'holiday' | 'weekend' | 'past' | 'out';
 type Day = { date: Date; iso: string; state: DayState } | null;
 type Month = { key: string; title: string; weeks: Day[][]; last: Date };
 
@@ -25,6 +25,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const LABELS: Record<DayState, string> = {
   morning: 'matin dispo (8h–12h)',
   full: 'journée complète',
+  off: 'pas disponible',
   holiday: 'jour férié',
   weekend: 'week-end',
   past: 'date passée',
@@ -36,6 +37,7 @@ function buildMonths(today: Date | null): Month[] {
   const end = parse(data.end);
   const holidays = new Set(data.holidays);
   const full = data.fullWeeks.map((w) => [parse(w.from), parse(w.to)] as const);
+  const off = (data.unavailable ?? []).map((w) => [parse(w.from), parse(w.to)] as const);
   const months: Month[] = [];
   for (let cursor = new Date(start.getFullYear(), start.getMonth(), 1); cursor <= end; cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1)) {
     const y = cursor.getFullYear();
@@ -51,6 +53,7 @@ function buildMonths(today: Date | null): Month[] {
       if (date < start || date > end) state = 'out';
       else if (dow >= 5) state = 'weekend';
       else if (holidays.has(iso)) state = 'holiday';
+      else if (off.some(([a, b]) => date >= a && date <= b)) state = 'off';
       else if (full.some(([a, b]) => date >= a && date <= b)) state = 'full';
       else state = 'morning';
       if (today && date < today && state !== 'weekend' && state !== 'out') state = 'past';
@@ -142,7 +145,7 @@ export function Availability() {
                 <span className="cal__key cal__key--full" aria-hidden="true" /> Journée complète
               </li>
               <li>
-                <span className="cal__key cal__key--off" aria-hidden="true" /> Férié, passé ou week-end
+                <span className="cal__key cal__key--off" aria-hidden="true" /> Pas dispo, férié, passé ou week-end
               </li>
             </ul>
           </div>
