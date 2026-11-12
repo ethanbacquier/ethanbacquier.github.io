@@ -76,7 +76,7 @@
       "role": "Développeur web bénévole",
       "name": "Refonte du site du VBVB",
       "meta": "En cours · mon club de volley",
-      "link": null,
+      "link": "test.vbvb.fr",
       "text": "Nouveau site du Volley Ball Villefranche Beaujolais : actus, équipes, matchs, inscriptions. Pages pré-rendues pour le référencement.",
       "stack": "React · TypeScript · Vite · GSAP"
     }

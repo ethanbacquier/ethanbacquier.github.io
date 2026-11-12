@@ -16,6 +16,8 @@ export type ProjectLinks = {
   github: string | null;
   organization: string | null;
   live: string | null;
+  /** Version de test d’un projet en cours (ex. site du VBVB avant la mise en ligne). */
+  preview?: string | null;
   current: string | null;
 };
 

@@ -380,6 +380,7 @@ export function ProjectDetails({ project: p, headingLevel: H, headingId }: { pro
 function ProjectLinks({ project: p }: { project: Project }) {
   const items = [
     isFilled(p.links.live) && { href: p.links.live as string, label: 'Voir le site', icon: <IconGlobe aria-hidden="true" /> },
+    isFilled(p.links.preview) && { href: p.links.preview as string, label: 'Voir la version de test', icon: <IconGlobe aria-hidden="true" /> },
     isFilled(p.links.github) && { href: p.links.github as string, label: 'Code sur GitHub', icon: <IconGithub aria-hidden="true" /> },
     isFilled(p.links.organization) && { href: p.links.organization as string, label: 'Organisation GitHub', icon: <IconGithub aria-hidden="true" /> },
     isFilled(p.links.current) && { href: p.links.current as string, label: 'Site actuel du club', icon: <IconGlobe aria-hidden="true" /> },
