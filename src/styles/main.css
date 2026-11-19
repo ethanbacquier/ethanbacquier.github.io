@@ -1163,6 +1163,35 @@ textarea {
 }
 
 /* ---------- Hero ---------- */
+/* Sortie du hero sur téléphone et tablette : animation liée au défilement, calculée par le
+   navigateur hors du fil principal (fluide même quand la 3D travaille). Classe posée par About.tsx
+   seulement si le navigateur sait faire (animation-timeline) ; sinon GSAP prend le relais.
+   Même réglage que la version GSAP : du bas du hero à 95 % de l'écran jusqu'à 40 %. */
+@keyframes hero-out-left {
+  to {
+    transform: translate3d(-18%, 0, 0);
+    opacity: 0;
+  }
+}
+@keyframes hero-out-right {
+  to {
+    transform: translate3d(18%, 0, 0);
+    opacity: 0;
+  }
+}
+.hero--scroll-css {
+  view-timeline: --hero-exit block;
+}
+.hero--scroll-css .hero__left,
+.hero--scroll-css .hero__right {
+  will-change: transform, opacity;
+  animation: hero-out-left linear both;
+  animation-timeline: --hero-exit;
+  animation-range: entry-crossing calc(100% + 5svh) entry-crossing calc(100% + 60svh);
+}
+.hero--scroll-css .hero__right {
+  animation-name: hero-out-right;
+}
 .hero {
   position: relative;
   overflow-x: clip;
@@ -2917,15 +2946,14 @@ button.quick-link:active {
   .tile--hero {
     grid-row: span 1;
   }
-  /* Sur téléphone, seul le nom de l'outil reste affiché (le reste est lu par les lecteurs d'écran) :
-     la place libérée va au clavier, qui prend toute la largeur de l'écran */
+  /* Sur téléphone, la phrase reste affichée, plus petite, sur une hauteur fixe de 2 lignes :
+     le clavier ne bouge pas d'une touche à l'autre */
   .toolbox__quip {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    max-width: 36ch;
+    min-height: 2.8em;
+    color: var(--muted);
   }
   .toolbox__stage {
     height: min(76vw, 400px);

@@ -25,19 +25,31 @@ export function About() {
         ease: 'none',
         scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 25%', scrub: true },
       });
-      // Le contenu du hero s'écarte
-      gsap.to(document.querySelector('.hero__left'), {
-        xPercent: -18,
-        autoAlpha: 0,
-        ease: 'none',
-        scrollTrigger: { trigger: el, start: 'top 95%', end: 'top 40%', scrub: true },
-      });
-      gsap.to(document.querySelector('.hero__right'), {
-        xPercent: 18,
-        autoAlpha: 0,
-        ease: 'none',
-        scrollTrigger: { trigger: el, start: 'top 95%', end: 'top 40%', scrub: true },
-      });
+      // Le contenu du hero s'écarte.
+      // Téléphone et tablette : animation CSS liée au défilement (hors du fil principal, voir main.css),
+      // sinon les blocs suivaient le doigt par à-coups pendant que la 3D occupait le fil principal.
+      const hero = document.querySelector('.hero');
+      const compact = window.matchMedia('(max-width: 1023px)').matches;
+      if (compact && hero && CSS.supports?.('animation-timeline', 'view()')) {
+        hero.classList.add('hero--scroll-css');
+      } else {
+        // Sans prise en charge sur téléphone : léger lissage pour gommer les à-coups
+        const scrub = compact ? 0.3 : true;
+        gsap.to(document.querySelector('.hero__left'), {
+          xPercent: -18,
+          autoAlpha: 0,
+          ease: 'none',
+          force3D: true,
+          scrollTrigger: { trigger: el, start: 'top 95%', end: 'top 40%', scrub },
+        });
+        gsap.to(document.querySelector('.hero__right'), {
+          xPercent: 18,
+          autoAlpha: 0,
+          ease: 'none',
+          force3D: true,
+          scrollTrigger: { trigger: el, start: 'top 95%', end: 'top 40%', scrub },
+        });
+      }
       // Le texte passe du gris au blanc, mot à mot
       const words = el.querySelectorAll('.about__text .aw');
       gsap.fromTo(
@@ -52,7 +64,10 @@ export function About() {
       );
       revealFade(el.querySelectorAll('.about__label, .offscreen'), el, { start: 'top 70%' });
     }, el);
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      document.querySelector('.hero')?.classList.remove('hero--scroll-css');
+    };
   }, []);
 
   const off = profile.offscreen;
