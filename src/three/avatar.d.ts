@@ -24,7 +24,7 @@ export type Avatar = {
   setBlink: (open: number) => void;
   /** Sourire : 0 neutre, 1 sourire. */
   setSmile: (v: number) => void;
-  setSplit?: (on: boolean) => void;
+  setSplit?: (mode: 'rest' | 'R' | 'both') => void;
 };
 
 export type Terminal = { texture: THREE.CanvasTexture; draw: () => void; step: () => void };

@@ -14,18 +14,30 @@ F=pid[F0]; CUV=UV0[F0]            # faces soudées, UV par coin
 ix=names.index; arm={s:[ix('ua'+s),ix('la'+s),ix('h'+s)] for s in 'LR'}; armall=arm['L']+arm['R']
 low=VTw[:,1]<YCUT
 grp=np.zeros(len(P),int)
-for k,s in enumerate('LR'): grp[low&(Wo[:,arm[s]].sum(1)>0.5)]=k+1
+SIDES=sys.argv[5] if len(sys.argv)>5 else 'LR'; BSMOOTH=int(sys.argv[6]) if len(sys.argv)>6 else 8   # bras à séparer (R : salut seul)
+for k,s in enumerate('LR'):
+  if s in SIDES: grp[low&(Wo[:,arm[s]].sum(1)>0.5)]=k+1
+  else: grp[low&(Wo[:,arm[s]].sum(1)>0.5)]=-1   # bras non séparé : poids d'origine, intact
 grp[~low]=-1
 W=Wo.copy()
 def only(w,keep):
   k=np.zeros(len(names)); k[keep]=1; x=w*k; return x/x.sum() if x.sum()>1e-6 else None
-body=[i for i in range(len(names)) if i not in armall]
+body=[i for i in range(len(names)) if i not in sum((arm[x] for x in SIDES),[])]
 for v in np.where(low)[0]:
   W[v]=only(Wo[v],arm['LR'[grp[v]-1]] if grp[v]>0 else body) if (only(Wo[v],arm['LR'[grp[v]-1]] if grp[v]>0 else body) is not None) else Wo[v]
 fg=grp[F]; armin=(fg>0).any(1); bodyin=(fg==0).any(1)
 cut=armin&bodyin&~(fg==-1).all(1)
 print('faces de jonction',cut.sum())
 cutv=np.unique(F[cut])
+# Bord du flanc en dents de scie (ligne des poids à 50 %) : lissé sur la surface du buste (maillage séparé seulement).
+cb0=cutv[grp[cutv]==0]
+nb=defaultdict(set)
+for f in F[~cut]:
+  for i in range(3): nb[f[i]].update((f[(i+1)%3],f[(i+2)%3]))
+for it in range(BSMOOTH):
+  Q=P.copy()
+  for v in cb0:
+    if nb[v]: P[v]=0.5*Q[v]+0.5*Q[list(nb[v])].mean(0)
 NP=list(P); NW=list(W); NN=list(N); dup_body={}; dup_arm={}
 bodyv=np.where(grp==0)[0]; tb=cKDTree(P[bodyv])
 # Les copies sont ramenées sur le bord de leur propre côté : la bande de jonction s'écrase (aire nulle) au lieu de
@@ -40,13 +52,13 @@ for v in cutv:
     s='L' if P[v,0]>0 else 'R'; av=np.where(grp==(1 if s=='L' else 2))[0]
     w=only(Wo[v],arm[s]); w=w if w is not None else W[av[cKDTree(P[av]).query(P[v])[1]]]
     k_=1 if s=='L' else 2; dup_arm[v]=len(NP); NP.append(P[ca[k_][tca[k_].query(P[v])[1]]]); NW.append(w); NN.append(N[v])
-NF=[f for f in F[~cut]]; NC=[c for c in CUV[~cut]]
+NF=[f for f in F[~cut]]; NC=[c for c in CUV[~cut]]; FT=[0]*len(NF)
 # Faces de jonction supprimées (le site affiche le maillage d'origine bras le long du corps : rien à cacher au repos).
 # KEEP_BRIDGE=1 : ancienne variante, faces doublées (une copie par côté), qui laissait une « aile » sur le flanc.
 if KEEP_BRIDGE:
   for f,c in zip(F[cut],CUV[cut]):
-    NF.append([dup_body.get(v,v) for v in f]); NC.append(c)
-    NF.append([dup_arm.get(v,v) for v in f]); NC.append(c)
+    NF.append([dup_body.get(v,v) for v in f]); NC.append(c); FT.append(1)
+    NF.append([dup_arm.get(v,v) for v in f]); NC.append(c); FT.append(2)
 NF=np.array(NF); NC=np.array(NC)
 # bords ouverts
 cnt=defaultdict(int); dirs={}
@@ -73,7 +85,7 @@ tex=np.asarray(m.visual.material.baseColorTexture.convert('RGB')).astype(np.floa
 def colat(u): return tex[min(Ht-1,int((1-u[1])*Ht)),min(Wt-1,int(u[0]*Wt))]
 NP=np.array(NP); NW=np.array(NW); NN=np.array(NN)
 side_of=lambda v: 'arm' if (v in dup_arm.values() or (v<len(grp) and grp[v]>0)) else ('body' if (v in dup_body.values() or (v<len(grp) and grp[v]==0)) else 'top')
-capF=[]; capUV=[]; capWant=[]
+capF=[]; capUV=[]; capWant=[]; INNER=[]
 from joints import J
 def axis_pt(p,want,sx):
   # point de l'axe le plus proche : os du bras (épaule → main) ou axe vertical du buste
@@ -84,7 +96,7 @@ def axis_pt(p,want,sx):
     u=np.clip((p-h)@ab/(ab@ab),0,1); q=h+u*ab
     if best is None or np.linalg.norm(p-q)<np.linalg.norm(p-best): best=q
   return best
-ROWS=5; BULGE_ARM=1.0; BULGE_BODY=1.0  # côté buste : bombé comme le flanc (au repos, le site affiche le maillage d’origine)
+ROWS=5; RELAX=6; BULGE_ARM=1.0; BULGE_BODY=1.0  # côté buste : bombé comme le flanc (au repos, le site affiche le maillage d’origine)
 def zip_strip(run,outward,uvpick,want='arm',sx=1):
   # Bouchon arrondi : entre les deux brins, des rangées de points sur un arc autour de l'axe du bras (ou du buste),
   # au rayon de la surface voisine, pour que le dessous de la manche garde son volume au lieu d'être plat.
@@ -99,7 +111,7 @@ def zip_strip(run,outward,uvpick,want='arm',sx=1):
       s_=k/ROWS; c=(1-s_)*pa+s_*pb; o=axis_pt(c,want,sx); v=c-o
       ra=np.linalg.norm(pa-axis_pt(pa,want,sx)); rb=np.linalg.norm(pb-axis_pt(pb,want,sx))
       if np.linalg.norm(v)>1e-5: c=c+(BULGE_ARM if want=='arm' else BULGE_BODY)*(o+v/np.linalg.norm(v)*((1-s_)*ra+s_*rb)-c)
-      P2.append(c); W2.append((1-s_)*NW[va]+s_*NW[vb]); row.append(len(NP)+len(P2)-1)
+      P2.append(c); W2.append((1-s_)*NW[va]+s_*NW[vb]); row.append(len(NP)+len(P2)-1); INNER.append((len(NP)+len(P2)-1,want))
     row.append(vb)
     if P2:
       NP=np.vstack([NP,P2]); NW=np.vstack([NW,W2]); NN=np.vstack([NN,np.zeros((len(P2),3))])
@@ -136,6 +148,15 @@ for loop in loops:
           Q=NP[run].copy()
           for k in mv: NP[run[k]]=0.5*Q[k]+0.25*(Q[k-1]+Q[k+1])
         zip_strip(run,outward,uvpick,want,sx); print(' bouchon',want,len(run))
+# Relaxation des points intérieurs des bouchons (dents de scie du bord) : moyenne des voisins, quelques passes.
+nbc=defaultdict(set)
+for t in capF:
+  for i in range(3): nbc[t[i]].update((t[(i+1)%3],t[(i+2)%3]))
+inner=[i for i,_ in INNER]
+for it in range(RELAX):
+  Q=NP.copy()
+  for v in inner:
+    if nbc[v]: NP[v]=0.5*Q[v]+0.5*Q[list(nbc[v])].mean(0)
 # sommets propres aux bouchons (normales lissées sur le bouchon)
 capF=np.array(capF); remap={}; CP=[];CW=[]
 for v in np.unique(capF): remap[v]=len(NP)+len(CP); CP.append(NP[v]); CW.append(NW[v])
@@ -153,12 +174,13 @@ for v in list(cutv[grp[cutv]>0])+list(dup_arm.values()):
 # Normales radiales (depuis l'axe du bras ou du buste) : le bouchon s'éclaire comme un cylindre de tissu,
 # dans la continuité de la manche, au lieu d'une facette plate.
 for t,(want,sx) in zip(capF,capWant):
+  if want!='arm': continue   # flanc : normales de sa propre forme
   for v in t:
     p=NP[v]; r=p-axis_pt(p,want,sx)
     if want=='body': r[1]=0
     if np.linalg.norm(r)>1e-6: CN[remap[v]-len(NP)]=r/np.linalg.norm(r)
 NP=np.vstack([NP,CP]); NW=np.vstack([NW,CW]); NN=np.vstack([NN,CN])
-NF=np.vstack([NF,capF2]); NC=np.vstack([NC,np.repeat(np.array(capUV)[:,None,:],3,1)])
+FT=FT+[3 if w_=='arm' else 4 for (w_,_) in capWant]; NF=np.vstack([NF,capF2]); NC=np.vstack([NC,np.repeat(np.array(capUV)[:,None,:],3,1)])
 # maillage final : un sommet par (sommet soudé, UV)
 key={}; OP=[];OU=[];ON=[];OW=[];OF=np.zeros_like(NF)
 for fi in range(len(NF)):
@@ -170,5 +192,5 @@ OP=np.array(OP);OU=np.array(OU);ON=np.array(ON);OW=np.array(OW,np.float32)
 out=trimesh.Trimesh(OP,OF,vertex_normals=ON,process=False)
 out.visual=trimesh.visual.TextureVisuals(uv=OU,material=m.visual.material)
 open(src_out,'wb').write(trimesh.exchange.gltf.export_glb(trimesh.Scene(out),include_normals=True))
-np.savez('w_cut.npz',co=OP,W=OW,names=np.array(names))
+np.savez('w_cut.npz',co=OP,W=OW,names=np.array(names)); np.savez('cut_dbg.npz',F=OF,FT=np.array(FT),P=OP,W=OW)
 print('ok',len(OP),len(OF))

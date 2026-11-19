@@ -46,11 +46,14 @@ export function avatarFromGltf(gltf: GLTF): Avatar {
     setGaze: none,
     setBlink: none,
     setSmile: none,
-    // Deux maillages sur le même squelette (tools/avatar-glb/merge.py) : « rest » (maillage d'origine, parfait bras
-    // le long du corps) et « split » (bras séparés du corps, propre bras levé ou assis, mais fentes au repos).
-    setSplit: (on: boolean) => {
-      if (!meshes.split || !meshes.rest) return;
-      meshes.split.visible = on; meshes.rest.visible = !on;
+    // Trois maillages sur le même squelette (tools/avatar-glb/merge.py) : « rest » (maillage d'origine, parfait bras
+    // le long du corps), « splitR » (bras droit séparé du corps : salut) et « split » (les deux bras : assis).
+    // Un bras séparé laisse une fente s'il reste le long du corps : on ne sépare que les bras qui s'en écartent.
+    setSplit: (mode: 'rest' | 'R' | 'both') => {
+      if (!meshes.rest) return;
+      const pick = mode === 'both' ? meshes.split : mode === 'R' ? meshes.splitR : meshes.rest;
+      const shown = pick ?? meshes.rest;
+      for (const k of ['rest', 'splitR', 'split']) if (meshes[k]) meshes[k].visible = meshes[k] === shown;
     },
   };
 }
@@ -119,7 +122,7 @@ export function sitPoseGlb(t: number, P: Pose) {
 export function wavePoseGlb(t: number, P: Pose, idle: (t: number, P: Pose) => void) {
   idle(t, P);
   const swing = Math.sin(t * 9);
-  set(P, 'uaR', -0.42 + 0.04 * swing, 0, -0.42);                 // bras le long du corps, à peine écarté : le sweat ne s'étire pas
+  set(P, 'uaR', -0.5 + 0.04 * swing, 0, -0.15);                  // haut du bras contre le flanc : rien ne s'ouvre sous l'aisselle
   set(P, 'laR', -1.95, 0, -0.22 + 0.17 * swing);                 // avant-bras levé qui balance, sans passer devant le menton
   set(P, 'hR', 0, 0.3, 0.15 * swing);
   set(P, 'head', P.head[0], P.head[1], P.head[2] - 0.05);

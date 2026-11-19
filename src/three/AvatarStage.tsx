@@ -310,7 +310,7 @@ function Scene() {
     const br = (lerp(s.poseIdle.breath, s.poseSit.breath, w) * 0.5 + 0.5) * 0.012;
     avatar.torso.scale.set(1 + br * 0.6, 1 + br, 1 + br);   // l'aplatissement du torse est déjà dans sa géométrie
     typeFingers(avatar, t, w, ww);
-    avatar.setSplit?.(ww > 0.15 || w > 0.02);   // bras séparés du corps seulement quand ils s'en écartent
+    avatar.setSplit?.(w > 0.02 ? 'both' : ww > 0.15 ? 'R' : 'rest');   // bras séparés du corps seulement quand ils s'en écartent
 
     // 5. La tête suit le pointeur (sinon balayage lent)
     if (now - s.look.last < 3000) {
