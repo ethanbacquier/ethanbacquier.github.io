@@ -15,6 +15,7 @@ import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
 import { AVATAR_GLB, avatarFromGltf, blendWave, sitPoseGlb, wavePoseGlb } from './avatarGlb';
 import { AdaptiveDpr } from './AdaptiveDpr';
+import { useTouchScrolling } from '../lib/touchScroll';
 
 type Rect = { x: number; y: number; w: number; h: number };
 type Framing = { center: THREE.Vector3; height: number; width: number; dir: THREE.Vector3 };
@@ -419,6 +420,16 @@ function ClearWhenPaused({ active }: { active: boolean }) {
   return null;
 }
 
+/** Mode « demand » (défilement tactile) : une image dès qu'un emplacement apparaît, pour ne pas le
+ * laisser vide jusqu'à la fin du geste. */
+function RenderOnShow({ active }: { active: boolean }) {
+  const invalidate = useThree((st) => st.invalidate);
+  useEffect(() => {
+    if (active) invalidate();
+  }, [active, invalidate]);
+  return null;
+}
+
 export default function AvatarStage({ onLost }: { onLost: () => void }) {
   const pageVisible = usePageVisible();
   const [slotVisible, setSlotVisible] = useState(true);
@@ -513,6 +524,10 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
     };
   }, [track]);
 
+  // Écran tactile : rendu suspendu pendant le défilement (« demand » : une seule image quand un
+  // emplacement apparaît, sinon le canevas garde sa dernière image et défile avec la page).
+  const scrolling = useTouchScrolling(track);
+  const active = pageVisible && slotVisible;
   const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
   return (
     <div ref={stageRef} className={`stage${track ? ' stage--track' : ''}`} aria-hidden="true">
@@ -520,7 +535,7 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
         dpr={dpr}
         gl={{ antialias: dpr < 2, alpha: true, powerPreference: 'high-performance' }}
         camera={{ fov: 30, near: 0.05, far: 40, position: [0, 1.4, 3] }}
-        frameloop={pageVisible && slotVisible ? 'always' : 'never'}
+        frameloop={!active ? 'never' : scrolling ? 'demand' : 'always'}
         onCreated={({ gl }) => {
           gl.toneMappingExposure = 1.05;
           gl.domElement.addEventListener('webglcontextlost', (e) => {
@@ -534,7 +549,8 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
           <Scene />
         </Suspense>
         <AdaptiveDpr max={dpr} min={1} />
-        <ClearWhenPaused active={pageVisible && slotVisible} />
+        <ClearWhenPaused active={active} />
+        <RenderOnShow active={active} />
       </Canvas>
     </div>
   );

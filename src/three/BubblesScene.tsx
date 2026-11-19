@@ -13,6 +13,7 @@ import { markWebGLLost } from '../lib/capabilities';
 import { useTheme } from '../lib/theme';
 import { Warmup } from './Warmup';
 import { AdaptiveDpr } from './AdaptiveDpr';
+import { useTouchScrolling } from '../lib/touchScroll';
 import { makeWalnutTexture } from './walnut';
 
 type Props = {
@@ -729,7 +730,11 @@ function World({ projects, docked, request, onDock, wrapper, tip, topInset, onAn
 }
 
 export default function BubblesScene(props: Props) {
-  const { paused, maxBubbles, onLost, projects, ...rest } = props;
+  const { paused: hidden, maxBubbles, onLost, projects, ...rest } = props;
+  // Écran tactile : physique et rendu suspendus pendant le défilement de la page (voir touchScroll.ts).
+  // Une bulle qu'on tient au doigt ne fait pas défiler la page, donc elle n'est jamais figée.
+  const scrolling = useTouchScrolling(!hidden);
+  const paused = hidden || scrolling;
   // Liste stable : recréée à chaque rendu de la section, elle faisait redessiner les 5 noms (textures 1024²)
   // à chaque étape du dépôt, d'où des à-coups pendant l'animation
   const list = useMemo(() => projects.slice(0, maxBubbles), [projects, maxBubbles]);
