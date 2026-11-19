@@ -13,5 +13,6 @@ Outils lancés une fois (pas dans le build). Python 3 avec `trimesh numpy scipy 
 5. **Squelette dans le GLB** : `python3 bake.py coupe.glb w_cut.npz avatar-rig.glb`. Os aux noms de `avatar.js`, rotations nulles au repos, mis à l'échelle (pieds à 0, bassin à 0,667).
 6. **Deux maillages dans un GLB** : `python3 merge.py rig-origine.glb splitR=rig-bras-droit.glb split=rig-deux-bras.glb avatar-2.glb` (squelette commun). Le site affiche le maillage d'origine bras le long du corps (aucune découpe visible au repos), « splitR » pendant le salut et « split » assis (`setSplit` dans `src/three/avatarGlb.ts`).
 7. **Manches** : `python3 sleevetex.py avatar-2.glb avatar-3.glb 0.0` ramène les taches gris clair des manches (contact poignet / hanche peint par l'IA) à la teinte de la manche, sans toucher la peau.
-8. **Compression** : `npx @gltf-transform/cli optimize avatar-3.glb avatar.glb --no-simplify --texture-size 2048 --texture-compress webp --compress meshopt`.
+8. **Col et capuche** : `python3 collartex.py avatar-3.glb avatar-4.glb` (bord peau / sweat lissé en 3D dans la texture, sans toucher la tête) puis `python3 normsmooth.py avatar-4.glb avatar-5.glb` (normales lissées sur la capuche : plus de facettes, forme inchangée).
+9. **Compression** : `npx @gltf-transform/cli optimize avatar-5.glb avatar.glb --no-simplify --texture-size 2048 --texture-compress webp --compress meshopt`.
 8. **Pose assise** : `python3 ik.py` calcule les angles des bras (`SIT_ARM` dans `src/three/avatarGlb.ts`) pour que les poignets tombent sur le clavier du bureau.

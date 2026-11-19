@@ -763,7 +763,8 @@ export function buildLights() {
 // Le clavier reste à l'endroit où tombent les mains de la pose assise (sitPoseGlb dans avatarGlb.ts).
 // Hauteurs réglées le 19/11 sur l'avatar IA (grosse tête, jambes courtes, cuisses épaisses) : plateau plus
 // haut pour que les genoux passent dessous, assise plus basse pour que les pieds touchent le sol.
-export const DESK_LAYOUT = { top: 0.67, seat: 0.2, monitor: 0.08 };
+// kb : clavier agrandi et reculé (19/11, Ethan : « pas proportionné, le clavier est trop proche » ; les mains du perso sont grosses).
+export const DESK_LAYOUT = { top: 0.67, seat: 0.2, monitor: 0.08, kb: { scale: 1.4, z: 0.55 } };
 export function buildDesk() {
   const g = new THREE.Group();
   const wood = std(0x2A2328, 0.55);
@@ -786,12 +787,13 @@ export function buildDesk() {
   g.add(mesh(new RoundedBoxGeometry(1.16, 0.05, 0.02, 2, 0.008), metal, { p: [0, TOP_Y - 0.05, 0.86] }));
 
   // Tapis de bureau
-  g.add(mesh(new RoundedBoxGeometry(0.82, 0.004, 0.3, 2, 0.002), fabric(0x1A1820), { p: [-0.08, TOP_Y + 0.019, 0.5] }));
+  g.add(mesh(new RoundedBoxGeometry(0.82, 0.004, 0.3, 2, 0.002), fabric(0x1A1820), { p: [-0.08, TOP_Y + 0.019, 0.54] }));
 
   // Clavier : boîtier bas incliné + touches (5 rangées) + barre d'espace
   const kb = new THREE.Group();
-  kb.position.set(0, TOP_Y + 0.024, 0.48);
+  kb.position.set(0, TOP_Y + 0.024, DESK_LAYOUT.kb.z);
   kb.rotation.x = -0.05;
+  kb.scale.set(DESK_LAYOUT.kb.scale, 1 + (DESK_LAYOUT.kb.scale - 1) * 0.5, DESK_LAYOUT.kb.scale);
   kb.add(mesh(new RoundedBoxGeometry(0.42, 0.018, 0.14, 3, 0.007), plastic));
   const KEY = 0.024, GAP = 0.0035, rows = [14, 14, 13, 12, 0];
   const keyGeo = new RoundedBoxGeometry(KEY, 0.01, KEY, 2, 0.003);
@@ -817,8 +819,8 @@ export function buildDesk() {
     mp.setXYZ(i, mv.x * 0.03, mv.y * (0.018 + 0.006 * smooth(0.4, -0.6, mv.z)), mv.z * 0.05);
   }
   mouseGeo.computeVertexNormals();
-  g.add(mesh(mouseGeo, plastic, { p: [-0.33, TOP_Y + 0.021, 0.48] }));
-  g.add(mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.005, 12), keyMat, { p: [-0.33, TOP_Y + 0.041, 0.502], r: [0, 0, Math.PI / 2] }));
+  g.add(mesh(mouseGeo, plastic, { p: [-0.4, TOP_Y + 0.021, 0.55] }));
+  g.add(mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.005, 12), keyMat, { p: [-0.4, TOP_Y + 0.041, 0.572], r: [0, 0, Math.PI / 2] }));
 
   // Mug
   const mug = std(0xE9E5EE, 0.4);
@@ -859,9 +861,9 @@ export function buildDesk() {
     g.add(l);
   }
 
-  g.add(mesh(new RoundedBoxGeometry(0.15, 0.012, 0.21, 2, 0.004), std(0x3B3446, 0.8), { p: [0.33, TOP_Y + 0.024, 0.72], r: [0, 0.25, 0] }));
-  g.add(mesh(new RoundedBoxGeometry(0.146, 0.004, 0.205, 1, 0.002), std(0xEDE8DF, 0.9), { p: [0.33, TOP_Y + 0.031, 0.72], r: [0, 0.25, 0] }));
-  g.add(mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.14, 10), std(0xB49CFF, 0.4), { p: [0.4, TOP_Y + 0.037, 0.71], r: [Math.PI / 2, 0, 0.6] }));
+  g.add(mesh(new RoundedBoxGeometry(0.15, 0.012, 0.21, 2, 0.004), std(0x3B3446, 0.8), { p: [0.42, TOP_Y + 0.024, 0.74], r: [0, 0.25, 0] }));
+  g.add(mesh(new RoundedBoxGeometry(0.146, 0.004, 0.205, 1, 0.002), std(0xEDE8DF, 0.9), { p: [0.42, TOP_Y + 0.031, 0.74], r: [0, 0.25, 0] }));
+  g.add(mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.14, 10), std(0xB49CFF, 0.4), { p: [0.49, TOP_Y + 0.037, 0.73], r: [Math.PI / 2, 0, 0.6] }));
 
   // Écran : pied à plaque, colonne, dalle fine avec dos arrondi
   g.add(mesh(new RoundedBoxGeometry(0.22, 0.012, 0.15, 3, 0.005), metal, { p: [0, TOP_Y + 0.024, 0.8] }));

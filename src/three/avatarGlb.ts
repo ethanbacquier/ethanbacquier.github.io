@@ -88,14 +88,16 @@ function keyPress(t: number, seed: number) {
 // poignets au-dessus du clavier, avant-bras au-dessus du bord du bureau. Angles des bras trouvés par
 // optimisation numérique sur ce squelette (tools/avatar-glb/ik.py, à recalculer si le bureau ou le squelette
 // changent) ; hauteurs mesurées sur le maillage déformé (tools/avatar-glb/sitmeasure.py).
-const SIT_ARM = { ua: [-1.17, -0.089, -0.371], la: [-0.042, -0.157], hand: [-0.007, 0.03, 0.348] };
+// 19/11 : clavier agrandi et reculé (DESK_LAYOUT.kb) ; buste un peu penché vers l'avant pour l'atteindre (bras courts),
+// ik.py avec SPINE=0.2 CHEST=0.06 HY=0.435 TGT=0.15,0.75,0.47 DIR=0,-0.3,0.95 EDGE=0.3,0.72.
+const SIT_ARM = { ua: [-1.332, 0.113, -0.357], la: [-0.072, 0.052], hand: [-0.047, 0.012, 0.269] };
 export function sitPoseGlb(t: number, P: Pose) {
   const b = Math.sin(t * 1.7);
   set(P, 'hips', 0, 0, 0);
-  set(P, 'spine', 0.06, 0, 0);
-  set(P, 'chest', 0.04 + 0.01 * b, 0.03 * Math.sin(t * 0.9), 0);   // le buste suit un peu les mains
+  set(P, 'spine', 0.2, 0, 0);
+  set(P, 'chest', 0.06 + 0.01 * b, 0.03 * Math.sin(t * 0.9), 0);   // le buste suit un peu les mains
   set(P, 'neck', 0.03, 0, 0);
-  set(P, 'head', 0.1 + 0.02 * Math.sin(t * 2.1), 0.05 * Math.sin(t * 0.4), 0);
+  set(P, 'head', -0.06 + 0.02 * Math.sin(t * 2.1), 0.05 * Math.sin(t * 0.4), 0);
   const act = typingActivity(t);
   for (const [side, sx, seed] of [['L', 1, 0], ['R', -1, 5.3]] as const) {
     // Frappe réaliste sans doigts articulés : les mains restent posées au-dessus des touches, chaque touche est

@@ -12,7 +12,7 @@ HIPS_Y=float(os.environ.get('HY',0.37)); HIPS_Z=0.0
 TGT=[float(x) for x in os.environ.get('TGT','0.12,0.665,0.40').split(',')]
 DIR=np.array([float(x) for x in os.environ.get('DIR','0,-0.35,0.94').split(',')]); DIR/=np.linalg.norm(DIR)
 EDGE=[float(x) for x in os.environ.get('EDGE','0.3,0.66').split(',')]
-POSE={'hips':(0,0,0),'spine':(0.06,0,0),'chest':(0.04,0,0)}
+POSE={'hips':(0,0,0),'spine':(float(os.environ.get('SPINE',0.06)),0,0),'chest':(float(os.environ.get('CHEST',0.04)),0,0)}
 def fk(side,ua,la,h):
   sx=1 if side=='L' else -1
   M=np.eye(3); p=np.array([0,HIPS_Y,HIPS_Z+T(J['hips'][1])[2]])
