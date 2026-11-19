@@ -1134,6 +1134,14 @@ textarea {
   opacity: 0;
   transition: opacity 0.8s ease;
 }
+/* Téléphone et tablette : canevas posé dans la page (top et hauteur calculés par AvatarStage.tsx),
+   il défile avec elle au lieu d'être recalé en JavaScript à chaque image */
+.stage--track {
+  position: absolute;
+  inset: auto 0 auto 0;
+  top: 0;
+  height: 100svh;
+}
 .is-loaded .stage,
 .reduced-motion .stage {
   opacity: 1;

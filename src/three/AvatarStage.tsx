@@ -1,7 +1,7 @@
 // Scène fixe de l'avatar : un seul Canvas plein écran, derrière le contenu.
 // L'avatar est cadré dans des « emplacements » réservés dans le DOM (data-slot) : hero, À propos,
 // bureau. Le texte ne peut donc jamais passer sous lui.
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, typeFingers } from './avatar.js';
 import { stageState } from '../lib/stageState';
+import { ScrollTrigger } from '../lib/motion';
 import { markWebGLLost } from '../lib/capabilities';
 import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
@@ -30,12 +31,17 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const lerp = THREE.MathUtils.lerp;
 
+// Origine du canevas à l'écran, relue à chaque image. Plein écran fixe (ordinateur) : (0, 0).
+// Téléphone et tablette : le canevas défile avec la page (voir AvatarStage), les emplacements sont
+// donc mesurés par rapport à lui, ce qui ne dépend plus du défilement.
+const ORIGIN = { x: 0, y: 0 };
+
 function readRect(el: Element | null, out: Rect): boolean {
   if (!el) return false;
   const r = el.getBoundingClientRect();
   if (r.width < 2 || r.height < 2) return false;
-  out.x = r.left;
-  out.y = r.top;
+  out.x = r.left - ORIGIN.x;
+  out.y = r.top - ORIGIN.y;
   out.w = r.width;
   out.h = r.height;
   return true;
@@ -181,7 +187,10 @@ function Scene() {
     const t = s.time;
     const now = performance.now();
 
-    // 1. Emplacement courant à l'écran
+    // 1. Emplacement courant, par rapport au canevas
+    const origin = gl.domElement.getBoundingClientRect();
+    ORIGIN.x = origin.left;
+    ORIGIN.y = origin.top;
     const hasHero = readRect(s.slots.hero, s.hero);
     const hasAbout = readRect(s.slots.about, s.about);
     const hasDesk = readRect(s.slots.desk, s.desk);
@@ -428,9 +437,65 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
     return () => io.disconnect();
   }, []);
 
-  const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
+  // Téléphone et tablette : le canevas n'est plus fixé à l'écran. Il est posé dans la page, du haut de
+  // l'emplacement du hero au bas de celui du bureau, et défile donc avec elle, géré par le navigateur hors
+  // du fil principal. Fixé à l'écran, l'avatar était recalé en JavaScript à chaque image et suivait le
+  // doigt avec un temps de retard : il tremblait au défilement. Ça évite aussi de redimensionner le
+  // canevas quand la barre d'adresse se replie.
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [track, setTrack] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
+  const [trackH, setTrackH] = useState(0);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    const onChange = () => setTrack(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    if (!track) {
+      el.style.top = '';
+      el.style.height = '';
+      return;
+    }
+    let raf = 0;
+    const layout = () => {
+      raf = 0;
+      const hero = document.querySelector('[data-slot="hero"]');
+      const desk = document.querySelector('[data-slot="desk"]');
+      if (!hero || !desk) return;
+      const h = hero.getBoundingClientRect();
+      const d = desk.getBoundingClientRect();
+      // Marge au-dessus du hero : la découpe du rendu déborde de 12 % en haut
+      const top = Math.max(0, Math.round(h.top + window.scrollY - h.height * 0.15));
+      const height = Math.round(d.bottom + window.scrollY + 8 - top);
+      el.style.top = `${top}px`;
+      el.style.height = `${height}px`;
+      setTrackH(height);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(layout);
+    };
+    layout();
+    const ro = new ResizeObserver(schedule);
+    const main = document.querySelector('main');
+    if (main) ro.observe(main);
+    window.addEventListener('resize', schedule);
+    ScrollTrigger.addEventListener('refresh', schedule);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener('resize', schedule);
+      ScrollTrigger.removeEventListener('refresh', schedule);
+    };
+  }, [track]);
+
+  let dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
+  // Canevas très haut : on reste sous 8 192 pixels de haut (limite des téléphones)
+  if (track && trackH > 0) dpr = Math.max(1, Math.min(dpr, 8000 / trackH));
   return (
-    <div className="stage" aria-hidden="true">
+    <div ref={stageRef} className={`stage${track ? ' stage--track' : ''}`} aria-hidden="true">
       <Canvas
         dpr={dpr}
         gl={{ antialias: dpr < 2, alpha: true, powerPreference: 'high-performance' }}
