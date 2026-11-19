@@ -7,12 +7,12 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, wavePose, typeFingers } from './avatar.js';
+import { buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, typeFingers } from './avatar.js';
 import { stageState } from '../lib/stageState';
 import { markWebGLLost } from '../lib/capabilities';
 import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
-import { AVATAR_GLB, avatarFromGltf, sitPoseGlb } from './avatarGlb';
+import { AVATAR_GLB, avatarFromGltf, sitPoseGlb, wavePoseGlb } from './avatarGlb';
 import { AdaptiveDpr } from './AdaptiveDpr';
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -289,7 +289,7 @@ function Scene() {
     const wt = s.waveT0 < 0 ? -1 : t - s.waveT0;
     const ww = wt < 0 || wt > WAVE_TIME ? 0 : ease(clamp01(wt / 0.35)) * ease(clamp01((WAVE_TIME - wt) / 0.45));
     if (ww > 0) {
-      wavePose(t, s.poseWave);
+      wavePoseGlb(t, s.poseWave, idlePose);
       for (const k of WAVE_KEYS) {
         const a = s.poseIdle[k], b = s.poseWave[k];
         a[0] = lerp(a[0], b[0], ww); a[1] = lerp(a[1], b[1], ww); a[2] = lerp(a[2], b[2], ww);

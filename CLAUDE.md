@@ -40,7 +40,7 @@ Ancien plan : bilingue FR/EN, hero en graphe réseau, write-ups CTF, terminal in
 - **Logos d'outils (keycaps)** : `@iconify-json/logos` / `@iconify-json/simple-icons` + `@iconify/utils` pour récupérer le SVG au build et le rasteriser en texture canvas. Si le logo n'existe pas → monogramme typographique (police système, gras). Jamais de faux logo.
 - **Polices du système** (refonte « Apple » du 30/10, demandée par Ethan) : SF Pro sur Apple, Segoe UI sur Windows, Roboto sur Android (`--font-display` / `--font-body` dans `main.css`), y compris dans les textures 3D (clavier, bulles). Plus aucune police téléchargée, plus de préchargement. Les paquets `@fontsource*` restent installés **uniquement** pour `tools/og.html` (l'image Open Graph a été dessinée avec Archivo, Inter et JetBrains Mono, voir `CREDITS.md`).
 - **Formulaire** : Web3Forms (`https://api.web3forms.com/submit`). Clé dans `VITE_FORM_KEY` (la clé Web3Forms est publique par conception). **Si la clé est absente, le formulaire est remplacé proprement par un lien mailto.**
-- **Avatar** : modélisé en code (`src/three/avatar.js`), aucun GLB. Si un GLB est ajouté un jour : compression meshopt, ou décodeur Draco auto-hébergé dans `public/draco/` (celui de drei vient de gstatic et casserait la CSP).
+- **Avatar** (depuis le 19/11) : modèle GLB généré par IA (`public/assets/avatar/avatar.glb`, meshopt + WebP, chargé par `GLTFLoader` + `MeshoptDecoder` de Three.js, jamais de décodeur venu d'un CDN : CSP). Voir §6 « Avatar ». Bureau, chaise, écran et lumières restent en code (`avatar.js`).
 - **Pré-rendu au build** (obligatoire) : le site doit être lisible sans JavaScript. Build SSR de l'app (`renderToString`) injecté dans `dist/index.html`, puis `hydrateRoot` côté client. Les Canvas Three.js sont client-only (montés après hydratation). Tout le contenu textuel (compétences, projets, timeline, dispos, contact) est dans le HTML pré-rendu.
 - **Build 100 % statique.**
 
@@ -66,7 +66,9 @@ Fournir un `.env.example`. Ne jamais committer de `.env`.
 | `src/lib/dotGrid.ts` | Grille de points du fond (lumière sous le curseur, onde au clic) |
 | `src/lib/theme.ts` + `public/theme.js` | Thème clair / sombre (bouton de l'en-tête, choix gardé dans le navigateur) |
 | `src/lib/capabilities.ts` | Détection WebGL, « réduire les animations », appareil modeste, pointeur précis |
-| `src/three/avatar.js` (+ `.d.ts`) | Avatar figurine, bureau, écran terminal, poses debout/assis |
+| `src/three/avatar.js` (+ `.d.ts`) | Bureau, écran terminal, lumières, poses debout / salut (ancienne figurine `buildAvatar`, plus affichée) |
+| `src/three/avatarGlb.ts` | Avatar IA : chargement du GLB, os, pose assise `sitPoseGlb` |
+| `tools/avatar-glb/` | Chaîne de fabrication du GLB (retouche de texture, squelette, angles des bras) |
 | `src/three/AvatarStage.tsx` | Canvas fixe de l'avatar, cadrage dans les emplacements DOM |
 | `src/three/KeyboardScene.tsx` | Clavier 3D |
 | `src/three/BubblesScene.tsx` | Bulles projets (Rapier) |
@@ -317,7 +319,7 @@ Structure suggérée :
 | Fichier | Rôle | Statut |
 |---|---|---|
 | `assets-src/avatar/*.jpg` | Photos de référence d'Ethan | Hors `public/`, **gitignorées** (ne jamais les déployer) |
-| `src/three/avatar.js` | **Avatar figurine modélisé en code** (validé par Ethan le 17/10) | Fait |
+| `public/assets/avatar/avatar.glb` | **Avatar généré par IA** (validé par Ethan le 19/11), remplace la figurine en code | Fait |
 | `public/assets/avatar/avatar-poster.webp` (+ `-450`) | Image fixe du buste | Fait (rendu de l'avatar) |
 | `public/assets/avatar/desk-poster.webp` (+ `-600`) | Image fixe au bureau | Fait |
 | `public/assets/about/volley.webp` | Photo d'Ethan en match | Plus tard |
@@ -336,6 +338,10 @@ Traits à respecter (photos) : cheveux brun foncé, volumineux sur le dessus, c�
 
 ### Avatar
 Construction, réglages et régénération des images fixes : voir `docs/AVATAR.md`.
+
+**Avatar IA (19/11, validé par Ethan)** : Ethan trouvait l'avatar en code « immonde » et refuse désormais toute 3D modélisée en code (ne plus jamais en proposer). Visuel de concept (Canva) → Hunyuan3D-2 en local sur son PC (Pinokio, gratuit : il refuse de payer Tripo / Meshy / Higgsfield) → texture retouchée sans toucher la forme (lisser ou subdiviser la géométrie abîmait col et cheveux) → squelette (`tools/avatar-glb/`). Tête qui suit la souris, salut, assis au bureau en train de taper. Pas de clignement, de sourire ni de doigts (yeux et bouche peints). Licence : Tencent Hunyuan 3D 2.0 Community License (crédité dans `CREDITS.md` et la modale Crédits).
+
+Historique de l'ancienne figurine en code (plus affichée) :
 
 **Refonte « propre et pro » en cours (depuis le 19/10)**, décidée avec Ethan, validée étape par étape (captures avant/après, un commit par étape) : style figurine vinyle premium, proportions inchangées, toujours modélisé en code.
 1. Tête et visage — **fait**. Ethan a gardé la **forme du visage et les yeux d'origine** (billes noires brillantes) ; nouveaux sourcils sculptés, nez couleur peau, oreilles en coquille, bouche (pli + lèvre inférieure), moustache fine et bouc en relief aux bords fondus.
@@ -446,7 +452,7 @@ Encart « Comment ce site est sécurisé » au-dessus (liste dans `Footer.tsx`, 
 
 Témoignages (`Testimonials.tsx`, entre Projets et Disponibilités) : affichés seulement si `testimonials.json` contient des entrées réelles avec `consent: true`. Jamais de témoignage inventé.
 
-Pied : « © 2026 Ethan Bacquier · Fait à Lyon » · « Politique de confidentialité » (`confidentialite.html`) · « Mentions légales » (`mentions-legales.html`) · « Crédits » (modale `<dialog>`, liste en dur dans `Footer.tsx`, à garder alignée avec `CREDITS.md` : avatar et scènes en code, polices, icônes Solar / Simple Icons, bibliothèques) · « Retour en haut ↑ ».
+Pied : « © 2026 Ethan Bacquier · Fait à Lyon » · « Politique de confidentialité » (`confidentialite.html`) · « Mentions légales » (`mentions-legales.html`) · « Crédits » (modale `<dialog>`, liste en dur dans `Footer.tsx`, à garder alignée avec `CREDITS.md` : avatar IA (Hunyuan3D-2), scènes en code, polices, icônes Solar / Simple Icons, bibliothèques) · « Retour en haut ↑ ».
 
 ---
 
@@ -514,7 +520,7 @@ script-src 'self' 'wasm-unsafe-eval';
 style-src 'self';
 font-src 'self';
 img-src 'self' data: blob:;
-connect-src 'self' https://api.web3forms.com;
+connect-src 'self' blob: https://api.web3forms.com;   /* blob: : texture intégrée au GLB de l'avatar (19/11) */
 form-action 'self' https://api.web3forms.com;
 worker-src 'self' blob:;
 base-uri 'self';

@@ -3,13 +3,16 @@
 <style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
 </head><body>
 <script type="module">
-// Outil de développement : rend une image fixe de l'avatar (fond transparent).
+// Outil de développement : rend une image fixe de l'avatar (public/assets/avatar/avatar.glb, fond transparent).
 // ?view=bust|desk|og|face|head|full|hands|shoes|collar|deskfront|kb&w=900&h=1000 — ouvert via `npm run dev` puis /tools/poster.html
 // Contrôle : &turn=0.6 (rotation de l'avatar en radians, 1.57 = profil), &bg=1 (fond du site au lieu du transparent),
 // &gaze=0.4 (regard vers la droite), &blink=0 (paupières fermées), &smile=1, &wave=1 (salut), &t=1.2 (instant de l'animation).
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { buildAvatar, buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, sitPose, wavePose, typeFingers } from '/src/three/avatar.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, typeFingers } from '/src/three/avatar.js';
+import { AVATAR_GLB, avatarFromGltf, sitPoseGlb as sitPose, wavePoseGlb } from '/src/three/avatarGlb.ts';
 const q = new URLSearchParams(location.search);
 const view = q.get('view') || 'bust', W = +(q.get('w') || 900), H = +(q.get('h') || 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -20,7 +23,7 @@ const scene = new THREE.Scene();
 const pm = new THREE.PMREMGenerator(renderer);
 scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.35;
 scene.add(buildLights());
-const av = buildAvatar(); scene.add(av.root);
+const av = avatarFromGltf(await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(AVATAR_GLB)); scene.add(av.root);
 av.root.rotation.y = +(q.get('turn') || 0);
 av.setGaze(+(q.get('gaze') || 0), 0);
 av.setBlink(+(q.get('blink') ?? 1));
@@ -28,7 +31,7 @@ av.setSmile(+(q.get('smile') || 0));
 const J = { hips: av.hips, spine: av.spine, chest: av.chest, neck: av.neck, head: av.head, uaL: av.arms.L.ua, uaR: av.arms.R.ua, laL: av.arms.L.la, laR: av.arms.R.la, hL: av.arms.L.hand, hR: av.arms.R.hand, ulL: av.legs.L.ul, ulR: av.legs.R.ul, llL: av.legs.L.ll, llR: av.legs.R.ll, fL: av.legs.L.foot, fR: av.legs.R.foot };
 const seated = view === 'desk' || view === 'deskfront' || view === 'kb';
 const T = +(q.get('t') || 0.6);
-const P = makePose(); (seated ? sitPose : q.get('wave') ? wavePose : idlePose)(T, P);
+const P = makePose(); (seated ? sitPose : q.get('wave') ? (t, P) => wavePoseGlb(t, P, idlePose) : idlePose)(T, P);
 for (const k of JOINT_KEYS) J[k].rotation.set(...P[k]);
 av.hips.position.y = P.hipsY;
 typeFingers(av, T, seated ? 1 : 0, q.get('wave') ? 1 : 0);
@@ -56,7 +59,7 @@ if (view === 'desk' || view === 'deskfront' || view === 'kb') {
 } else if (view === 'face') {
   cam.position.set(0, 1.42, 1.45); cam.lookAt(0, 1.4, 0);
 } else if (view === 'og') {
-  cam.position.set(0.55, 1.5, 2.25); cam.lookAt(0, 1.38, 0);
+  cam.position.set(0.55, 1.6, 2.45); cam.lookAt(0, 1.47, 0);
 } else {
   cam.position.set(0.2, 1.5, 2.75); cam.lookAt(0, 1.36, 0);
 }

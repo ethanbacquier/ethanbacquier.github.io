@@ -2,8 +2,8 @@
 
 ## Avatar et scènes 3D
 
-- **Avatar « figurine »** : modélisé en code avec Three.js (`src/three/avatar.js`), inspiré de photos d'Ethan. Aucun fichier 3D externe, aucun modèle tiers.
-- **Bureau, chaise, écran, clavier, bulles** : géométries Three.js générées en code.
+- **Avatar** : modèle 3D généré avec Hunyuan3D-2 (Tencent, Tencent Hunyuan 3D 2.0 Community License) à partir d'un visuel de concept choisi par Ethan, puis retouché (texture), équipé d'un squelette et animé pour le site (`public/assets/avatar/avatar.glb`, chaîne dans `tools/avatar-glb/`).
+- **Bureau, chaise, écran, clavier, bulles, éclairage** : géométries Three.js générées en code.
 - Les images fixes (`public/assets/avatar/*.webp`) et l'image Open Graph sont des rendus de ces scènes.
 
 ## Polices

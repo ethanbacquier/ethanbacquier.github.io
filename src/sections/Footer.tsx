@@ -8,7 +8,7 @@ const CREDITS = [
   {
     title: 'Avatar et scènes 3D',
     items: [
-      "Avatar « figurine » modélisé en code avec Three.js, inspiré de photos d'Ethan (aucun fichier 3D externe).",
+      'Avatar\u00a0: modèle 3D généré avec Hunyuan3D-2 (Tencent) à partir d\'un visuel de concept, retouché, équipé d\'un squelette et animé pour le site.',
       'Bureau, clavier et bulles\u00a0: géométries Three.js générées en code.',
     ],
   },

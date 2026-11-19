@@ -76,3 +76,13 @@ export function sitPoseGlb(t: number, P: Pose) {
   P.hipsY = 0.37;
   P.breath = b;
 }
+
+// Salut : main droite levée à côté du visage (la grosse tête cachait la main du salut de l'ancien avatar).
+export function wavePoseGlb(t: number, P: Pose, idle: (t: number, P: Pose) => void) {
+  idle(t, P);
+  const swing = Math.sin(t * 9);
+  set(P, 'uaR', -1.2, 0.3 + 0.08 * swing, -0.9);
+  set(P, 'laR', -1.1, 0, -0.25 + 0.2 * swing);   // balancement surtout vers l'extérieur : la main ne touche pas la joue
+  set(P, 'hR', 0.2, 0, 0.12 * swing);
+  set(P, 'head', P.head[0], P.head[1], P.head[2] - 0.05);
+}

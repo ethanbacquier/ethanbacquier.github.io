@@ -10,7 +10,8 @@ export function buildCsp({ meta = false } = {}) {
     "style-src 'self'",
     "font-src 'self'",
     "img-src 'self' data: blob:",
-    `connect-src 'self' ${FORM_ORIGIN}`,
+    // blob: : GLTFLoader lit la texture intégrée à avatar.glb par fetch() sur une URL blob:
+    `connect-src 'self' blob: ${FORM_ORIGIN}`,
     `form-action 'self' ${FORM_ORIGIN}`,
     "worker-src 'self' blob:",
     "base-uri 'self'",

@@ -1,5 +1,16 @@
 # L'avatar
 
+**Depuis le 19 novembre 2026**, l'avatar du site est un **modèle 3D généré par IA** : `public/assets/avatar/avatar.glb` (415 Ko, compression meshopt, texture WebP 2048). Visuel de concept choisi par Ethan → Hunyuan3D-2 en local → texture retouchée → squelette. Toute la chaîne est dans `tools/avatar-glb/` (voir son README).
+
+- **Chargement** : `src/three/avatarGlb.ts` (`avatarFromGltf`), appelé par `AvatarStage.tsx` avec `GLTFLoader` + `MeshoptDecoder` de Three.js (décodeur inclus dans le code du site, compatible avec la CSP : `'wasm-unsafe-eval'`).
+- **Squelette** : os `hips > spine > chest > neck > head`, bras `ua/la/h` et jambes `ul/ll/f` (`L` = gauche du perso, côté +x), mêmes noms que les articulations de `avatar.js` et **rotations nulles au repos** : les poses `idlePose` et `wavePose` de `avatar.js` s'appliquent telles quelles. La pose assise a sa propre version (`sitPoseGlb`, angles des bras calculés par `tools/avatar-glb/ik.py`).
+- **Limites** : yeux et bouche peints sur la texture, donc ni clignement ni sourire ; mains sans doigts articulés (pas de frappes des doigts).
+- **Décor** : bureau, chaise, écran terminal et éclairage restent construits en code dans `avatar.js` (`buildDesk`, `buildLights`).
+
+Ethan ne veut plus d'avatar modélisé en code (19/11). La suite de ce document décrit l'**ancienne figurine en code** (`buildAvatar` dans `avatar.js`), qui n'est plus affichée sur le site.
+
+# Ancienne figurine en code (plus utilisée)
+
 L'avatar est une **figurine modélisée directement en code** avec Three.js, dans `src/three/avatar.js`. Il n'y a aucun fichier 3D (`.glb`) à générer ni à charger : le site reste léger et l'avatar se modifie en quelques lignes.
 
 Il s'inspire de photos d'Ethan sans chercher la ressemblance exacte :
@@ -57,7 +68,9 @@ Pour les recréer :
 2. Ouvre `http://localhost:5173/tools/poster.html?view=bust&w=900&h=1000` (ou `view=desk&w=1200&h=800`).
    Pour contrôler une retouche : `view=face` (gros plan), `&turn=0.6` (3/4) ou `&turn=1.57` (profil), `&bg=1` (fond du site), `&gaze=0.4`, `&blink=0`.
 3. Fais une capture du canvas **sur fond transparent** (sans `&bg=1` ; avec Playwright : `omitBackground: true`, sinon le fond devient blanc), puis convertis-la en WebP.
-4. Pour l'image Open Graph : `tools/og.html`, au format 1200 × 630.
+4. Pour l'image Open Graph : rends `view=og&w=700&h=630` dans `tools/og-avatar.png` (fond transparent), puis capture `tools/og.html` au format 1200 × 630 vers `public/og-image.jpg`.
+
+`tools/poster.html` charge `avatar.glb` (le modèle du site).
 
 Les versions réduites (`avatar-poster-450.webp`, `desk-poster-600.webp`) servent aux petits écrans.
 
