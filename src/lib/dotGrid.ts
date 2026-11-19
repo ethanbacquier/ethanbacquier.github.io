@@ -3,7 +3,7 @@
  * - Au repos : points discrets, qui s'estompent vers les bords de l'écran.
  * - La zone sous la souris s'allume en --accent et se soulève.
  * - Un clic (ou un toucher) dans le vide lance une onde.
- * - La grille défile à mi-vitesse (profondeur).
+ * - La grille défile à mi-vitesse (profondeur) ; sur écran tactile, elle reste fixe (fluidité).
  * `still` (réduire les animations, appareil modeste) : rien ne bouge, seule la lueur sous la souris apparaît en fondu.
  * Le dessin ne tourne que lorsqu'il y a quelque chose à animer ; sinon la dernière image reste affichée.
  */
@@ -35,6 +35,9 @@ function toRgb(color: string): string {
 export function startDotGrid(canvas: HTMLCanvasElement, still: boolean): () => void {
   const ctx = canvas.getContext('2d');
   if (!ctx) return () => {};
+  // Écran tactile : la grille reste fixe pendant le défilement. Redessinée en JavaScript à chaque
+  // image pour la parallaxe, elle prenait du retard sur le doigt et faisait saccader la page (19/11).
+  const pinned = still || window.matchMedia('(pointer: coarse)').matches;
 
   let W = 0;
   let H = 0;
@@ -70,16 +73,22 @@ export function startDotGrid(canvas: HTMLCanvasElement, still: boolean): () => v
 
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth;
-    H = window.innerHeight;
+    // Écran tactile : le canevas fait la hauteur maximale de l'écran (100lvh, main.css), il ne change donc
+    // pas quand la barre d'adresse se replie ; on ne redessine que si sa taille change vraiment
+    const w = pinned ? canvas.clientWidth || window.innerWidth : window.innerWidth;
+    const h = pinned ? canvas.clientHeight || window.innerHeight : window.innerHeight;
+    if (pinned && w === W && h === H) return false;
+    W = w;
+    H = h;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return true;
   }
 
   function draw() {
     // Sous « réduire les animations », la grille reste fixe à l'écran (pas de parallaxe)
-    const scroll = still ? 0 : window.scrollY;
+    const scroll = pinned ? 0 : window.scrollY;
     const offset = -((scroll * PARALLAX) % GAP);
     const cx = W / 2;
     const cy = H / 2;
@@ -166,11 +175,10 @@ export function startDotGrid(canvas: HTMLCanvasElement, still: boolean): () => v
     request();
   };
   const onScroll = () => {
-    if (!still) request();
+    if (!pinned) request();
   };
   const onResize = () => {
-    resize();
-    request();
+    if (resize()) request();
   };
   const onTheme = () => {
     readTheme();

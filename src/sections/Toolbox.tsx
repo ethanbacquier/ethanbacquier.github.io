@@ -36,7 +36,9 @@ export function Toolbox() {
     if (!el) return;
     const ctx = gsap.context(() => {
       revealWords(el.querySelector('.toolbox__title'));
-      if (isReducedMotion()) return;
+      // Écran tactile : pas de rotation au défilement (±3°, à peine visible) : chaque image du défilement
+      // redessinait le clavier en haute définition et faisait saccader la page sur téléphone (19/11)
+      if (isReducedMotion() || window.matchMedia('(pointer: coarse)').matches) return;
       gsap.fromTo(
         scroll.current,
         { rotation: -0.14 },
