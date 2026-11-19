@@ -54,22 +54,26 @@ const set = (P: Pose, k: string, x: number, y: number, z: number) => { const a =
 // poignets au-dessus du clavier, avant-bras au-dessus du bord du bureau. Angles des bras trouvés par
 // optimisation numérique sur ce squelette (tools/avatar-glb/ik.py, à recalculer si le bureau ou le squelette
 // changent) ; hauteurs mesurées sur le maillage déformé (tools/avatar-glb/sitmeasure.py).
-const SIT_ARM = { ua: [-0.984, -0.229, -0.345], la: [-0.615, -0.19], hand: [0.187, 0.099, 0.336] };
+const SIT_ARM = { ua: [-1.17, -0.089, -0.371], la: [-0.042, -0.157], hand: [-0.007, 0.03, 0.348] };
 export function sitPoseGlb(t: number, P: Pose) {
   const b = Math.sin(t * 1.7);
-  const tapL = Math.max(0, Math.sin(t * 12.3) * Math.sin(t * 3.7 + 1));
-  const tapR = Math.max(0, Math.sin(t * 11.1 + 2) * Math.sin(t * 2.9));
   set(P, 'hips', 0, 0, 0);
   set(P, 'spine', 0.06, 0, 0);
-  set(P, 'chest', 0.04 + 0.01 * b, 0, 0);
+  set(P, 'chest', 0.04 + 0.01 * b, 0.03 * Math.sin(t * 0.9), 0);   // le buste suit un peu les mains
   set(P, 'neck', 0.03, 0, 0);
   set(P, 'head', 0.1 + 0.02 * Math.sin(t * 2.1), 0.05 * Math.sin(t * 0.4), 0);
-  for (const [side, sx, tap] of [['L', 1, tapL], ['R', -1, tapR]] as const) {
-    const drift = 0.03 * Math.sin(t * 0.7 + sx);
+  for (const [side, sx, ph] of [['L', 1, 0], ['R', -1, 1.7]] as const) {
+    // Frappes : chaque main se soulève puis retombe sur les touches, à un rythme irrégulier et décalé de
+    // l'autre main ; pas de doigts articulés, donc tout le poignet frappe. Les mains glissent aussi sur le
+    // clavier (gauche / droite, avant / arrière) pour ne pas taper toujours au même endroit.
+    const burst = 0.55 + 0.45 * Math.sin(t * 0.8 + ph * 2);                    // phases plus ou moins rapides
+    const lift = Math.pow(0.5 + 0.5 * Math.sin(t * (13 + 2 * sx) + ph), 3) * burst;   // brève levée, retombe vite
+    const slide = 0.07 * Math.sin(t * 0.55 + ph) + 0.03 * Math.sin(t * 1.9 + ph * 3);
+    const reach = 0.06 * Math.sin(t * 0.7 + ph * 2);
     const { ua, la, hand } = SIT_ARM;
-    set(P, 'ua' + side, ua[0], sx * ua[1] + drift, sx * ua[2]);
-    set(P, 'la' + side, la[0] - 0.04 * tap, sx * la[1], 0);
-    set(P, 'h' + side, hand[0] + 0.12 * tap, sx * hand[1], sx * hand[2]);
+    set(P, 'ua' + side, ua[0] - reach - 0.05 * lift, sx * (ua[1] + slide), sx * ua[2]);
+    set(P, 'la' + side, la[0] - 0.18 * lift + reach, sx * la[1], 0);
+    set(P, 'h' + side, hand[0] - 0.4 * lift, sx * hand[1], sx * hand[2]);
   }
   set(P, 'ulL', -1.5, 0, 0.04); set(P, 'ulR', -1.5, 0, -0.04);
   set(P, 'llL', 1.45, 0, 0); set(P, 'llR', 1.45, 0, 0);
@@ -78,14 +82,14 @@ export function sitPoseGlb(t: number, P: Pose) {
   P.breath = b;
 }
 
-// Salut : main droite levée au-dessus de l'épaule, à côté de la tête (la grosse tête cachait la main du salut
-// de l'ancien avatar, et un bras écarté sortait de l'emplacement pendant la montée).
+// Salut : avant-bras levé, main à hauteur d'épaule à côté du visage, bras presque le long du corps (lever tout
+// le bras étirait le sweat sous l'aisselle et sortait de l'emplacement).
 export function wavePoseGlb(t: number, P: Pose, idle: (t: number, P: Pose) => void) {
   idle(t, P);
   const swing = Math.sin(t * 9);
-  set(P, 'uaR', -2.3, 0.06 * swing, -0.35);                       // bras levé devant l'épaule, coude près du corps
-  set(P, 'laR', -0.9, 0, -0.15 + 0.2 * swing);   // balancement surtout vers l'extérieur : la main ne touche pas la tête
-  set(P, 'hR', 0.1, 0, 0.12 * swing);
+  set(P, 'uaR', -0.42 + 0.04 * swing, 0, -0.42);                 // bras le long du corps, à peine écarté : le sweat ne s'étire pas
+  set(P, 'laR', -1.95, 0, -0.22 + 0.17 * swing);                 // avant-bras levé qui balance, sans passer devant le menton
+  set(P, 'hR', 0, 0.3, 0.15 * swing);
   set(P, 'head', P.head[0], P.head[1], P.head[2] - 0.05);
 }
 
