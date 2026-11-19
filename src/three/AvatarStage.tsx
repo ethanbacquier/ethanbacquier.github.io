@@ -13,7 +13,7 @@ import { ScrollTrigger } from '../lib/motion';
 import { markWebGLLost } from '../lib/capabilities';
 import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
-import { AVATAR_GLB, avatarFromGltf, blendWave, sitPoseGlb, wavePoseGlb } from './avatarGlb';
+import { AVATAR_GLB, avatarFromGltf, blendWave, sitPoseGlb, wavePoseGlb, waveWeight } from './avatarGlb';
 import { AdaptiveDpr } from './AdaptiveDpr';
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -57,7 +57,6 @@ function lerpRect(a: Rect, b: Rect, t: number, out: Rect) {
   out.h = lerp(a.h, b.h, t);
 }
 
-const WAVE_TIME = 1.9;
 const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Fondu au bas de l'emplacement (hero et À propos) : bande collée à la caméra, dessinée en dernier,
@@ -310,12 +309,12 @@ function Scene() {
     const w = ease(s.sitW);
     idlePose(t, s.poseIdle);
     sitPoseGlb(t, s.poseSit);
-    // Salut, une seule fois, juste après l'entrée du hero (bras droit, 1,9 s)
+    // Salut, une seule fois, juste après l'entrée du hero (bras droit, 2,8 s : WAVE_TIME dans avatarGlb.ts)
     if (s.waveT0 < 0 && stageState.intro >= 0.999 && pAbout < 0.05 && !reducedMotion) s.waveT0 = t + 0.15;
     const wt = s.waveT0 < 0 ? -1 : t - s.waveT0;
-    const ww = wt < 0 || wt > WAVE_TIME ? 0 : ease(clamp01(wt / 0.35)) * ease(clamp01((WAVE_TIME - wt) / 0.45));
+    const ww = waveWeight(wt);
     if (ww > 0) {
-      wavePoseGlb(t, s.poseWave, idlePose);
+      wavePoseGlb(wt, s.poseWave, idlePose);
       blendWave(s.poseIdle, s.poseWave, ww);
     }
     for (const k of JOINT_KEYS) {

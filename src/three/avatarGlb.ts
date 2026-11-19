@@ -119,15 +119,28 @@ export function sitPoseGlb(t: number, P: Pose) {
   P.breath = b;
 }
 
-// Salut : avant-bras levé, main à hauteur d'épaule à côté du visage, bras presque le long du corps (lever tout
-// le bras étirait le sweat sous l'aisselle et sortait de l'emplacement).
+// Durée du salut et poids (0 → 1 → 0) selon le temps depuis son début : partagé par le site et tools/poster.html.
+export const WAVE_TIME = 2.8;
+const easeIO = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const c01 = (x: number) => Math.min(1, Math.max(0, x));
+export function waveWeight(wt: number) {
+  return wt < 0 || wt > WAVE_TIME ? 0 : easeIO(c01(wt / 0.45)) * easeIO(c01((WAVE_TIME - wt) / 0.5));
+}
+
+// Salut : main levée à côté de la tête, l'avant-bras balance de gauche à droite en pivotant au coude (entre deux
+// poses A et B calculées pour que le mouvement reste dans le plan de l'écran), la main suit avec un léger retard.
+// Le buste penche un peu du côté opposé pour laisser la place au bras dans l'emplacement du hero (tête redressée).
+// Bras pas trop levé vers l'avant : au-delà, le sweat se tend en pan sous le coude.
+const WAVE = { uaX: -1.0, uaZ: -0.4, A: [-1.831, -0.3, 0.175] as [number, number, number], B: [-1.769, -0.3, -0.275] as [number, number, number], freq: 11, hand: [0, 0.9, 0], wag: 0.4, lag: 0.6, lean: 0.08 };
 export function wavePoseGlb(t: number, P: Pose, idle: (t: number, P: Pose) => void) {
   idle(t, P);
-  const swing = Math.sin(t * 9);
-  set(P, 'uaR', -0.5 + 0.04 * swing, 0, -0.15);                  // haut du bras contre le flanc : rien ne s'ouvre sous l'aisselle
-  set(P, 'laR', -1.95, 0, -0.22 + 0.17 * swing);                 // avant-bras levé qui balance, sans passer devant le menton
-  set(P, 'hR', 0, 0.3, 0.15 * swing);
-  set(P, 'head', P.head[0], P.head[1], P.head[2] - 0.05);
+  const W = WAVE, swing = Math.sin(t * W.freq);
+  set(P, 'uaR', W.uaX, 0, W.uaZ + 0.04 * swing);
+  const la = P.laR; la[0] = W.A[0]; la[1] = W.A[1]; la[2] = W.A[2];
+  slerpJoint(la, W.B, 0.5 + 0.5 * swing);
+  set(P, 'hR', W.hand[0], W.hand[1], W.hand[2] + W.wag * Math.sin(t * W.freq - W.lag));
+  P.spine[2] -= W.lean; P.chest[2] -= W.lean * 0.6;
+  set(P, 'head', P.head[0], P.head[1], P.head[2] - 0.05 + W.lean * 1.5);
 }
 
 // Mélange de deux rotations par le plus court chemin (quaternions) : un mélange angle par angle faisait passer
@@ -140,12 +153,15 @@ export function slerpJoint(a: [number, number, number], b: [number, number, numb
   a[0] = ea.x; a[1] = ea.y; a[2] = ea.z;
 }
 
-// Entrée et sortie du salut en deux temps : l'avant-bras se plie d'abord (la main remonte devant le buste),
-// puis le bras se lève. Sans ça, le bras tendu passait loin sur le côté, hors de l'emplacement de l'avatar.
+// Entrée et sortie du salut : l'avant-bras se plie vite (la main remonte devant le buste) pendant que le bras se
+// lève, coude ramené contre le flanc à mi-chemin. Sans ça, la main passait loin sur le côté, hors de l'emplacement.
 export function blendWave(idle: Pose, wave: Pose, ww: number) {
-  const fold = smooth(ww / 0.45), lift = smooth((ww - 0.3) / 0.7);
+  const fold = smooth(ww / 0.5), lift = smooth(ww);
   slerpJoint(idle.laR, wave.laR, fold);
   slerpJoint(idle.hR, wave.hR, fold);
   slerpJoint(idle.uaR, wave.uaR, lift);
+  idle.uaR[2] += 0.6 * Math.sin(Math.PI * lift);   // à mi-chemin, coude ramené contre le flanc : la main monte devant l'épaule, pas sur le côté
   slerpJoint(idle.head, wave.head, ww);
+  slerpJoint(idle.spine, wave.spine, ww);
+  slerpJoint(idle.chest, wave.chest, ww);
 }
