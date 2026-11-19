@@ -28,14 +28,18 @@ print('faces de jonction',cut.sum())
 cutv=np.unique(F[cut])
 NP=list(P); NW=list(W); NN=list(N); dup_body={}; dup_arm={}
 bodyv=np.where(grp==0)[0]; tb=cKDTree(P[bodyv])
+# Les copies sont ramenées sur le bord de leur propre côté : la bande de jonction s'écrase (aire nulle) au lieu de
+# rester comme un pan de sweat collé au flanc (« aile ») quand l'avant-bras se lève.
+cb=cutv[grp[cutv]==0]; tcb=cKDTree(P[cb])
+ca={k:cutv[grp[cutv]==k] for k in (1,2)}; tca={k:cKDTree(P[ca[k]]) for k in (1,2) if len(ca[k])}
 for v in cutv:
   if grp[v]>0:   # copie « corps » d'un sommet du bras
     w=only(Wo[v],body); w=w if w is not None else W[bodyv[tb.query(P[v])[1]]]
-    dup_body[v]=len(NP); NP.append(P[v]); NW.append(w); NN.append(N[v])
+    dup_body[v]=len(NP); NP.append(P[cb[tcb.query(P[v])[1]]]); NW.append(w); NN.append(N[v])
   elif grp[v]==0:
     s='L' if P[v,0]>0 else 'R'; av=np.where(grp==(1 if s=='L' else 2))[0]
     w=only(Wo[v],arm[s]); w=w if w is not None else W[av[cKDTree(P[av]).query(P[v])[1]]]
-    dup_arm[v]=len(NP); NP.append(P[v]); NW.append(w); NN.append(N[v])
+    k_=1 if s=='L' else 2; dup_arm[v]=len(NP); NP.append(P[ca[k_][tca[k_].query(P[v])[1]]]); NW.append(w); NN.append(N[v])
 NF=[f for f in F[~cut]]; NC=[c for c in CUV[~cut]]
 # Faces de jonction supprimées (le site affiche le maillage d'origine bras le long du corps : rien à cacher au repos).
 # KEEP_BRIDGE=1 : ancienne variante, faces doublées (une copie par côté), qui laissait une « aile » sur le flanc.
@@ -69,7 +73,7 @@ tex=np.asarray(m.visual.material.baseColorTexture.convert('RGB')).astype(np.floa
 def colat(u): return tex[min(Ht-1,int((1-u[1])*Ht)),min(Wt-1,int(u[0]*Wt))]
 NP=np.array(NP); NW=np.array(NW); NN=np.array(NN)
 side_of=lambda v: 'arm' if (v in dup_arm.values() or (v<len(grp) and grp[v]>0)) else ('body' if (v in dup_body.values() or (v<len(grp) and grp[v]==0)) else 'top')
-capF=[]; capUV=[]
+capF=[]; capUV=[]; capWant=[]
 from joints import J
 def axis_pt(p,want,sx):
   # point de l'axe le plus proche : os du bras (épaule → main) ou axe vertical du buste
@@ -111,7 +115,7 @@ def zip_strip(run,outward,uvpick,want='arm',sx=1):
         if len(set(t))<3: continue
         q=NP[t]; n=np.cross(q[1]-q[0],q[2]-q[0]); c=q.mean(0)
         if n@(c-axis_pt(c,want,sx))<0: t=t[::-1]
-        capF.append(t); capUV.append(uvpick)
+        capF.append(t); capUV.append(uvpick); capWant.append((want,sx))
 # texel du sweat : coin sombre le plus proche de la couleur médiane des faces voisines
 nearF=np.isin(NF,list(cutv)).any(1)
 cols=np.array([[colat(u) for u in c] for c in NC[nearF]]).reshape(-1,3); uvs=NC[nearF].reshape(-1,2)
@@ -141,6 +145,18 @@ for t in capF:
   q=NP[t]; n=np.cross(q[1]-q[0],q[2]-q[0])
   for v in t: CN[remap[v]-len(NP)]+=n
 CN/=np.linalg.norm(CN,axis=1,keepdims=True)+1e-12
+# Côté bras, la bande de jonction (copie « bras ») prend aussi des normales radiales : pas de cassure de lumière
+# entre la manche et le bouchon.
+for v in list(cutv[grp[cutv]>0])+list(dup_arm.values()):
+  sx_=1 if NP[v,0]>0 else -1; r=NP[v]-axis_pt(NP[v],'arm',sx_)
+  if np.linalg.norm(r)>1e-6: NN[v]=0.5*NN[v]+0.5*r/np.linalg.norm(r); NN[v]/=np.linalg.norm(NN[v])
+# Normales radiales (depuis l'axe du bras ou du buste) : le bouchon s'éclaire comme un cylindre de tissu,
+# dans la continuité de la manche, au lieu d'une facette plate.
+for t,(want,sx) in zip(capF,capWant):
+  for v in t:
+    p=NP[v]; r=p-axis_pt(p,want,sx)
+    if want=='body': r[1]=0
+    if np.linalg.norm(r)>1e-6: CN[remap[v]-len(NP)]=r/np.linalg.norm(r)
 NP=np.vstack([NP,CP]); NW=np.vstack([NW,CW]); NN=np.vstack([NN,CN])
 NF=np.vstack([NF,capF2]); NC=np.vstack([NC,np.repeat(np.array(capUV)[:,None,:],3,1)])
 # maillage final : un sommet par (sommet soudé, UV)
