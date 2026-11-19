@@ -1,22 +1,25 @@
 // Scène fixe de l'avatar : un seul Canvas plein écran, derrière le contenu.
 // L'avatar est cadré dans des « emplacements » réservés dans le DOM (data-slot) : hero, À propos,
 // bureau. Le texte ne peut donc jamais passer sous lui.
-import { useEffect, useMemo, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { buildAvatar, buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, sitPose, wavePose, typeFingers } from './avatar.js';
+import { buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, wavePose, typeFingers } from './avatar.js';
 import { stageState } from '../lib/stageState';
 import { markWebGLLost } from '../lib/capabilities';
 import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
+import { AVATAR_GLB, avatarFromGltf, sitPoseGlb } from './avatarGlb';
 import { AdaptiveDpr } from './AdaptiveDpr';
 
 type Rect = { x: number; y: number; w: number; h: number };
 type Framing = { center: THREE.Vector3; height: number; width: number; dir: THREE.Vector3 };
 
 const BUST: Framing = { center: new THREE.Vector3(0, 1.36, 0), height: 1.12, width: 0.86, dir: new THREE.Vector3(0.0, 0.08, 1).normalize() };
-const ABOUT: Framing = { center: new THREE.Vector3(0, 1.3, 0), height: 1.2, width: 0.8, dir: new THREE.Vector3(0.18, 0.1, 1).normalize() };
+const ABOUT: Framing = { center: new THREE.Vector3(0, 1.36, 0), height: 1.26, width: 0.8, dir: new THREE.Vector3(0.18, 0.1, 1).normalize() };
 const DESK: Framing = { center: new THREE.Vector3(0.05, 0.86, 0.3), height: 1.55, width: 1.6, dir: new THREE.Vector3(2.65, 0.8, -1.27).normalize() };
 
 const debug = typeof window !== 'undefined' && window.location.search.includes('debug');
@@ -90,7 +93,8 @@ function Environment() {
 
 function Scene() {
   const { camera, size, gl, scene } = useThree();
-  const avatar = useMemo(() => buildAvatar(), []);
+  const gltf = useLoader(GLTFLoader, AVATAR_GLB, (l) => l.setMeshoptDecoder(MeshoptDecoder));
+  const avatar = useMemo(() => avatarFromGltf(gltf), [gltf]);
   const lights = useMemo(() => buildLights(), []);
   const desk = useMemo(() => buildDesk(), []);
   const fade = useMemo(() => buildFade(), []);
@@ -279,7 +283,7 @@ function Scene() {
     s.sitW = sitTarget > s.sitW ? Math.min(sitTarget, s.sitW + step) : Math.max(sitTarget, s.sitW - step);
     const w = ease(s.sitW);
     idlePose(t, s.poseIdle);
-    sitPose(t, s.poseSit);
+    sitPoseGlb(t, s.poseSit);
     // Salut, une seule fois, juste après l'entrée du hero (bras droit, 1,9 s)
     if (s.waveT0 < 0 && stageState.intro >= 0.999 && pAbout < 0.05 && !reducedMotion) s.waveT0 = t + 0.15;
     const wt = s.waveT0 < 0 ? -1 : t - s.waveT0;
@@ -371,13 +375,7 @@ function Scene() {
 
   useEffect(
     () => () => {
-      avatar.root.traverse((o) => {
-        const m = o as THREE.Mesh;
-        if (m.isMesh) {
-          m.geometry.dispose();
-          (Array.isArray(m.material) ? m.material : [m.material]).forEach((mat) => mat.dispose());
-        }
-      });
+      // L'avatar vient du cache de useLoader : il n'est pas libéré ici (un nouveau montage le réutilise).
       desk.group.traverse((o) => {
         const m = o as THREE.Mesh;
         if (m.isMesh) {
@@ -389,7 +387,7 @@ function Scene() {
         }
       });
     },
-    [avatar, desk],
+    [desk],
   );
 
   return (
@@ -451,7 +449,9 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
           });
         }}
       >
-        <Scene />
+        <Suspense fallback={null}>
+          <Scene />
+        </Suspense>
         <AdaptiveDpr max={dpr} min={1} />
         <ClearWhenPaused active={pageVisible && slotVisible} />
       </Canvas>
