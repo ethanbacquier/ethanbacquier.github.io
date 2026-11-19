@@ -38,6 +38,7 @@ if (q.get('ww')) { const I = makePose(); idlePose(T, I); const w = +q.get('ww');
 for (const k of JOINT_KEYS) J[k].rotation.set(...P[k]);
 av.hips.position.y = P.hipsY;
 typeFingers(av, T, seated ? 1 : 0, q.get('wave') ? 1 : 0);
+av.setSplit?.(seated || !!q.get('wave'));
 const still = view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'face' || view === 'head';
 av.head.rotation.y += still ? 0 : 0.18; av.head.rotation.x += still ? 0 : -0.04;
 const cam = new THREE.PerspectiveCamera(30, W / H, 0.05, 40);

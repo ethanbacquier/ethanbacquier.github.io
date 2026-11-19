@@ -5,7 +5,7 @@ import numpy as np, trimesh, sys
 from collections import defaultdict
 from scipy.spatial import cKDTree
 from sitmeasure import W as W0, names, V as VT, m
-src_out=sys.argv[2]; YCUT=float(sys.argv[1]); SMOOTH=int(sys.argv[3]) if len(sys.argv)>3 else 0
+src_out=sys.argv[2]; YCUT=float(sys.argv[1]); SMOOTH=int(sys.argv[3]) if len(sys.argv)>3 else 0; KEEP_BRIDGE=int(sys.argv[4]) if len(sys.argv)>4 else 0
 F0=np.asarray(m.faces); P0=np.asarray(m.vertices); UV0=np.asarray(m.visual.uv); N0=np.asarray(m.vertex_normals)
 _,first,pid=np.unique(np.round(P0,6),axis=0,return_index=True,return_inverse=True); pid=pid.ravel()
 P=P0[first]; Wo=W0[first].copy(); VTw=VT[first]
@@ -37,9 +37,12 @@ for v in cutv:
     w=only(Wo[v],arm[s]); w=w if w is not None else W[av[cKDTree(P[av]).query(P[v])[1]]]
     dup_arm[v]=len(NP); NP.append(P[v]); NW.append(w); NN.append(N[v])
 NF=[f for f in F[~cut]]; NC=[c for c in CUV[~cut]]
-for f,c in zip(F[cut],CUV[cut]):
-  NF.append([dup_body.get(v,v) for v in f]); NC.append(c)
-  NF.append([dup_arm.get(v,v) for v in f]); NC.append(c)
+# Faces de jonction supprimées (le site affiche le maillage d'origine bras le long du corps : rien à cacher au repos).
+# KEEP_BRIDGE=1 : ancienne variante, faces doublées (une copie par côté), qui laissait une « aile » sur le flanc.
+if KEEP_BRIDGE:
+  for f,c in zip(F[cut],CUV[cut]):
+    NF.append([dup_body.get(v,v) for v in f]); NC.append(c)
+    NF.append([dup_arm.get(v,v) for v in f]); NC.append(c)
 NF=np.array(NF); NC=np.array(NC)
 # bords ouverts
 cnt=defaultdict(int); dirs={}
@@ -77,7 +80,7 @@ def axis_pt(p,want,sx):
     u=np.clip((p-h)@ab/(ab@ab),0,1); q=h+u*ab
     if best is None or np.linalg.norm(p-q)<np.linalg.norm(p-best): best=q
   return best
-ROWS=5; BULGE_ARM=1.0; BULGE_BODY=0.4  # côté buste : à peine bombé (au repos, ce bouchon est caché dans le bras)
+ROWS=5; BULGE_ARM=1.0; BULGE_BODY=1.0  # côté buste : bombé comme le flanc (au repos, le site affiche le maillage d’origine)
 def zip_strip(run,outward,uvpick,want='arm',sx=1):
   # Bouchon arrondi : entre les deux brins, des rangées de points sur un arc autour de l'axe du bras (ou du buste),
   # au rayon de la surface voisine, pour que le dessous de la manche garde son volume au lieu d'être plat.

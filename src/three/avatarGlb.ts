@@ -14,10 +14,12 @@ export function avatarFromGltf(gltf: GLTF): Avatar {
   root.name = 'Avatar';
   root.add(gltf.scene);
   const bones: Record<string, THREE.Object3D> = {};
+  const meshes: Record<string, THREE.Object3D> = {};
   gltf.scene.traverse((o) => {
     if ((o as THREE.Bone).isBone) bones[o.name] = o;
     const m = o as THREE.SkinnedMesh;
     if (m.isMesh) {
+      meshes[o.name] = o;
       m.frustumCulled = false; // la boîte englobante d'un maillage animé ne suit pas la pose
       const mat = m.material as THREE.MeshStandardMaterial;
       mat.roughness = 0.62;
@@ -44,6 +46,12 @@ export function avatarFromGltf(gltf: GLTF): Avatar {
     setGaze: none,
     setBlink: none,
     setSmile: none,
+    // Deux maillages sur le même squelette (tools/avatar-glb/merge.py) : « rest » (maillage d'origine, parfait bras
+    // le long du corps) et « split » (bras séparés du corps, propre bras levé ou assis, mais fentes au repos).
+    setSplit: (on: boolean) => {
+      if (!meshes.split || !meshes.rest) return;
+      meshes.split.visible = on; meshes.rest.visible = !on;
+    },
   };
 }
 
