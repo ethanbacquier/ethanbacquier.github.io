@@ -58,19 +58,19 @@ function typingActivity(t: number) {
   const n = 0.5 + 0.35 * Math.sin(t * 0.37) + 0.25 * Math.sin(t * 0.91 + 1.3);
   return smooth((n - 0.3) / 0.25);
 }
-// Pression d'une touche (0 → 1 → 0 en ~0,15 s), à des instants tirés au hasard sur une grille de 0,13 s :
+// Pression d'une touche (0 → 1 → 0 en ~0,25 s, courbes douces : pas d'à-coup), à des instants tirés au hasard sur une grille de 0,15 s :
 // rythme irrégulier, jamais mécanique, et décalé d'une main à l'autre (graine différente).
 function keyPress(t: number, seed: number) {
-  const step = 0.13, k = Math.floor(t / step);
+  const step = 0.15, k = Math.floor(t / step);
   let d = 0;
-  for (let j = k - 1; j <= k; j++) {
+  for (let j = k - 2; j <= k; j++) {
     if (hash(j * 1.618 + seed) > 0.5) continue;                   // une case sur deux environ : pas de frappe
     const t0 = (j + 0.7 * hash(j + seed * 3.7)) * step, u = t - t0;
-    if (u < 0 || u > 0.16) continue;
-    const env = u < 0.035 ? u / 0.035 : Math.exp(-(u - 0.035) * 30);  // enfoncée vite, relâchée un peu moins vite
-    d = Math.max(d, env * (0.55 + 0.45 * hash(j * 2.3 + seed)));
+    if (u < 0 || u > 0.3) continue;
+    const env = u < 0.07 ? smooth(u / 0.07) : Math.exp(-(u - 0.07) * 16);  // enfoncée en douceur, relâchée plus lentement
+    d += env * (0.55 + 0.45 * hash(j * 2.3 + seed));
   }
-  return d;
+  return Math.min(1, d);
 }
 
 // Assis en train de taper, pour les proportions de ce modèle (grosse tête, bras courts) : buste presque droit,
@@ -97,7 +97,7 @@ export function sitPoseGlb(t: number, P: Pose) {
     const { ua, la, hand } = SIT_ARM;
     set(P, 'ua' + side, ua[0] - reach + 0.02 * rest, sx * (ua[1] + drift), sx * ua[2]);
     set(P, 'la' + side, la[0] + reach + 0.02 * press, sx * la[1], 0);
-    set(P, 'h' + side, hand[0] + 0.09 * press + 0.05 * rest, sx * (hand[1] + 0.03 * Math.sin(t * 0.6 + seed)), sx * hand[2]);
+    set(P, 'h' + side, hand[0] + 0.075 * press + 0.05 * rest, sx * (hand[1] + 0.03 * Math.sin(t * 0.6 + seed)), sx * hand[2]);
   }
   set(P, 'ulL', -1.5, 0, 0.04); set(P, 'ulR', -1.5, 0, -0.04);
   set(P, 'llL', 1.45, 0, 0); set(P, 'llR', 1.45, 0, 0);

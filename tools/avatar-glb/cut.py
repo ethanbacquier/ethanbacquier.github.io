@@ -67,19 +67,48 @@ def colat(u): return tex[min(Ht-1,int((1-u[1])*Ht)),min(Wt-1,int(u[0]*Wt))]
 NP=np.array(NP); NW=np.array(NW); NN=np.array(NN)
 side_of=lambda v: 'arm' if (v in dup_arm.values() or (v<len(grp) and grp[v]>0)) else ('body' if (v in dup_body.values() or (v<len(grp) and grp[v]==0)) else 'top')
 capF=[]; capUV=[]
-def zip_strip(run,outward,uvpick):
+from joints import J
+def axis_pt(p,want,sx):
+  # point de l'axe le plus proche : os du bras (épaule → main) ou axe vertical du buste
+  if want=='body': return np.array([0.0,p[1],-0.03])
+  s='L' if sx>0 else 'R'; best=None
+  for n in ('ua'+s,'la'+s,'h'+s):
+    h,t=np.array(J[n][1],float),np.array(J[n][2],float); ab=t-h
+    u=np.clip((p-h)@ab/(ab@ab),0,1); q=h+u*ab
+    if best is None or np.linalg.norm(p-q)<np.linalg.norm(p-best): best=q
+  return best
+ROWS=5; BULGE_ARM=1.0; BULGE_BODY=0.4  # côté buste : à peine bombé (au repos, ce bouchon est caché dans le bras)
+def zip_strip(run,outward,uvpick,want='arm',sx=1):
+  # Bouchon arrondi : entre les deux brins, des rangées de points sur un arc autour de l'axe du bras (ou du buste),
+  # au rayon de la surface voisine, pour que le dessous de la manche garde son volume au lieu d'être plat.
+  global NP,NW,NN
   pts=NP[run]; L=np.r_[0,np.cumsum(np.linalg.norm(np.diff(pts,axis=0),axis=1))]
   mid=int(np.searchsorted(L,L[-1]/2)); a=run[:mid+1]; b=run[mid:][::-1]
-  i=j=0
+  rungs=[]; i=j=0
+  def rung(va,vb):
+    global NP,NW,NN
+    pa,pb=NP[va],NP[vb]; row=[va]; P2=[];W2=[]
+    for k in range(1,ROWS):
+      s_=k/ROWS; c=(1-s_)*pa+s_*pb; o=axis_pt(c,want,sx); v=c-o
+      ra=np.linalg.norm(pa-axis_pt(pa,want,sx)); rb=np.linalg.norm(pb-axis_pt(pb,want,sx))
+      if np.linalg.norm(v)>1e-5: c=c+(BULGE_ARM if want=='arm' else BULGE_BODY)*(o+v/np.linalg.norm(v)*((1-s_)*ra+s_*rb)-c)
+      P2.append(c); W2.append((1-s_)*NW[va]+s_*NW[vb]); row.append(len(NP)+len(P2)-1)
+    row.append(vb)
+    if P2:
+      NP=np.vstack([NP,P2]); NW=np.vstack([NW,W2]); NN=np.vstack([NN,np.zeros((len(P2),3))])
+    return row
+  rungs.append(rung(a[0],b[0]))
   while i<len(a)-1 or j<len(b)-1:
-    if j>=len(b)-1 or (i<len(a)-1 and np.linalg.norm(NP[a[i+1]]-NP[b[j]])<np.linalg.norm(NP[a[i]]-NP[b[j+1]])):
-      t=[a[i],a[i+1],b[j]]; i+=1
-    else:
-      t=[a[i],b[j+1],b[j]]; j+=1
-    if len(set(t))<3: continue
-    q=NP[t]; n=np.cross(q[1]-q[0],q[2]-q[0])
-    if n@outward<0: t=t[::-1]
-    capF.append(t); capUV.append(uvpick)
+    if j>=len(b)-1 or (i<len(a)-1 and np.linalg.norm(NP[a[i+1]]-NP[b[j]])<np.linalg.norm(NP[a[i]]-NP[b[j+1]])): i+=1
+    else: j+=1
+    rungs.append(rung(a[i],b[j]))
+  for R0,R1 in zip(rungs[:-1],rungs[1:]):
+    for m in range(ROWS):
+      for t in ([R0[m],R0[m+1],R1[m+1]],[R0[m],R1[m+1],R1[m]]):
+        if len(set(t))<3: continue
+        q=NP[t]; n=np.cross(q[1]-q[0],q[2]-q[0]); c=q.mean(0)
+        if n@(c-axis_pt(c,want,sx))<0: t=t[::-1]
+        capF.append(t); capUV.append(uvpick)
 # texel du sweat : coin sombre le plus proche de la couleur médiane des faces voisines
 nearF=np.isin(NF,list(cutv)).any(1)
 cols=np.array([[colat(u) for u in c] for c in NC[nearF]]).reshape(-1,3); uvs=NC[nearF].reshape(-1,2)
@@ -99,7 +128,7 @@ for loop in loops:
         for it in range(SMOOTH):
           Q=NP[run].copy()
           for k in mv: NP[run[k]]=0.5*Q[k]+0.25*(Q[k-1]+Q[k+1])
-        zip_strip(run,outward,uvpick); print(' bouchon',want,len(run))
+        zip_strip(run,outward,uvpick,want,sx); print(' bouchon',want,len(run))
 # sommets propres aux bouchons (normales lissées sur le bouchon)
 capF=np.array(capF); remap={}; CP=[];CW=[]
 for v in np.unique(capF): remap[v]=len(NP)+len(CP); CP.append(NP[v]); CW.append(NW[v])
