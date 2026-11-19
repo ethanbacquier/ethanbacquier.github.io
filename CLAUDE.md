@@ -481,7 +481,7 @@ Pied : « © 2026 Ethan Bacquier · Fait à Lyon » · « Politique de confident
 - Breakpoints : ≥ 1200 desktop · 768–1199 tablette · < 768 mobile
 - Mobile : hero en colonne (avatar en haut), pas de curseur custom, tête en balayage auto, pas de pin, colonne « À propos » sans avatar, timeline 1 colonne ligne à gauche, clavier compact complet (même disposition que sur ordinateur, touches ~32 px) avec le texte au-dessus, bulles tap uniquement + fiche en bottom sheet, calendrier 1 mois (swipe + boutons), formulaire pleine largeur, onglet CV vertical masqué (CV dans le menu).
 - Aucun scroll horizontal de page, gouttière ≥ 16 px.
-- Appareils faibles (`hardwareConcurrency ≤ 4` ou `deviceMemory ≤ 4`) : images fixes à la place de l'avatar 3D, 5 bulles max.
+- Appareils faibles (`hardwareConcurrency ≤ 2` ou `deviceMemory ≤ 2`, voir §16) : images fixes à la place de l'avatar 3D, 5 bulles max.
 
 ---
 
@@ -583,7 +583,7 @@ object-src 'none';
 
 - **Ne jamais mettre `scroll-behavior: smooth` sur `html`** (même pour la version sans JS) : ScrollTrigger mémorise la valeur au chargement et la réapplique en style inline après chaque recalcul, ce qui bloque Lenis (la page se fige puis rattrape tout d'un coup). Les règles CSS recommandées par Lenis (`.lenis.lenis-smooth { scroll-behavior: auto !important }`) sont dans `main.css`.
 - **Préchauffage 3D** : les scènes clavier et bulles sont montées hors écran dès que le navigateur est au repos après le chargement (`useIdleMount`, échelonné), avec compilation des shaders, envoi des textures et un rendu à blanc (`Warmup`). Sans ça, la compilation se terminait au premier affichage, en plein défilement.
-- Appareil « modeste » (`hardwareConcurrency ≤ 4` ou `deviceMemory ≤ 4`, comme le brief) : images fixes à la place de l'avatar 3D. Seuil réglable dans `src/App.tsx` si trop de PC portables tombent dedans.
+- Appareil « modeste » (`hardwareConcurrency ≤ 2` ou `deviceMemory ≤ 2` depuis le 19/11 : avec ≤ 4 du brief, les iPhone, qui annoncent au plus 4 cœurs, recevaient tous l'image fixe ; Ethan trouvait ça moche) : images fixes à la place de l'avatar 3D. Seuil réglable dans `src/App.tsx` si trop de PC portables tombent dedans.
 - Les apparitions au défilement utilisent `opacity` (pas `visibility`) : tout reste atteignable au clavier.
 - Couleurs de catégorie : supprimées le 11/11 (rappel : la CSP interdit les attributs `style` dans le HTML pré-rendu).
 - Onglet CV vertical masqué sur mobile ; le CV est dans le menu.

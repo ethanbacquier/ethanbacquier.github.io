@@ -23,7 +23,9 @@ export function getCapabilities(): Capabilities {
   cached = {
     reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     webgl: hasWebGL(),
-    lowEnd: (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4,
+    // Seuils bas (19/11) : Safari sur iPhone annonce au plus 4 cœurs quel que soit le modèle, et beaucoup de
+    // téléphones récents annoncent 4 Go : avec « ≤ 4 », tous les iPhone recevaient l'image fixe de l'avatar.
+    lowEnd: (nav.hardwareConcurrency ?? 8) <= 2 || (nav.deviceMemory ?? 8) <= 2,
     finePointer: window.matchMedia('(pointer: fine)').matches,
   };
   return cached;
