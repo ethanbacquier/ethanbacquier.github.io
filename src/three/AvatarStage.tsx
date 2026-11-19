@@ -15,7 +15,6 @@ import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
 import { AVATAR_GLB, avatarFromGltf, blendWave, sitPoseGlb, wavePoseGlb } from './avatarGlb';
 import { AdaptiveDpr } from './AdaptiveDpr';
-import { useTouchScrolling } from '../lib/touchScroll';
 
 type Rect = { x: number; y: number; w: number; h: number };
 type Framing = { center: THREE.Vector3; height: number; width: number; dir: THREE.Vector3 };
@@ -36,6 +35,10 @@ const lerp = THREE.MathUtils.lerp;
 // Téléphone et tablette : le canevas défile avec la page (voir AvatarStage), les emplacements sont
 // donc mesurés par rapport à lui, ce qui ne dépend plus du défilement.
 const ORIGIN = { x: 0, y: 0 };
+
+/** Téléphone et tablette : emplacement où le canevas est posé (écrit par AvatarStage). La scène n'y dépend
+ * plus du défilement : tout ce qui s'y anime suit l'horloge, le canevas défile avec la page sans retard. */
+const TRACK = { on: false, slot: 'hero' as 'hero' | 'desk' };
 
 function readRect(el: Element | null, out: Rect): boolean {
   if (!el) return false;
@@ -134,6 +137,7 @@ function Scene() {
       masked: '',
       look: { yaw: 0, pitch: 0, tYaw: 0, tPitch: 0, px: 0, py: 0, last: -10 },
       sitW: 0,
+      deskP: 0, // téléphone : arrivée au bureau jouée dans le temps (0 → 1)
       waveT0: -1,
       smile: 0,
       sacc: { x: 0, y: 0, next: 1 },
@@ -195,11 +199,24 @@ function Scene() {
     const hasHero = readRect(s.slots.hero, s.hero);
     const hasAbout = readRect(s.slots.about, s.about);
     const hasDesk = readRect(s.slots.desk, s.desk);
-    const pAbout = ease(clamp01(stageState.about));
-    const pTravel = ease(clamp01(stageState.travel));
-    const pDesk = clamp01(stageState.desk);
+    let pAbout = ease(clamp01(stageState.about));
+    let pTravel = ease(clamp01(stageState.travel));
+    let pDesk = clamp01(stageState.desk);
     let visible = true;
-    if (hasAbout && hasHero && hasDesk) {
+    if (TRACK.on) {
+      // Téléphone : rien ne suit le défilement. Au hero, le buste ; au bureau, l'arrivée (bureau qui monte,
+      // caméra qui recule, perso qui s'assoit) se joue en 1,6 s dès que l'emplacement entre bien à l'écran.
+      const atDesk = TRACK.slot === 'desk' && hasDesk;
+      if (atDesk) {
+        if (s.deskP > 0 || s.desk.y + ORIGIN.y < window.innerHeight * 0.8) s.deskP = Math.min(1, s.deskP + dt / 1.6);
+      } else s.deskP = 0;
+      pAbout = 0;
+      pTravel = atDesk ? 1 : 0;
+      pDesk = s.deskP;
+      if (atDesk) Object.assign(s.rect, s.desk);
+      else if (hasHero) Object.assign(s.rect, s.hero);
+      else visible = false;
+    } else if (hasAbout && hasHero && hasDesk) {
       if (pTravel > 0) lerpRect(s.about, s.desk, pTravel, s.rect);
       else lerpRect(s.hero, s.about, pAbout, s.rect);
     } else if (hasDesk && pTravel > 0) {
@@ -420,16 +437,6 @@ function ClearWhenPaused({ active }: { active: boolean }) {
   return null;
 }
 
-/** Mode « demand » (défilement tactile) : une image dès qu'un emplacement apparaît, pour ne pas le
- * laisser vide jusqu'à la fin du geste. */
-function RenderOnShow({ active }: { active: boolean }) {
-  const invalidate = useThree((st) => st.invalidate);
-  useEffect(() => {
-    if (active) invalidate();
-  }, [active, invalidate]);
-  return null;
-}
-
 export default function AvatarStage({ onLost }: { onLost: () => void }) {
   const pageVisible = usePageVisible();
   const [slotVisible, setSlotVisible] = useState(true);
@@ -466,6 +473,7 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
+    TRACK.on = track;
     if (!track) {
       el.style.top = '';
       el.style.height = '';
@@ -478,6 +486,7 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
     const place = () => {
       const mid = window.scrollY + window.innerHeight / 2;
       const key = mid > split ? 'desk' : 'hero';
+      TRACK.slot = key;
       const b = boxes[key];
       const sig = `${key}:${b.top}:${b.height}`;
       if (sig === current || !b.height) return;
@@ -524,9 +533,6 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
     };
   }, [track]);
 
-  // Écran tactile : rendu suspendu pendant le défilement (« demand » : une seule image quand un
-  // emplacement apparaît, sinon le canevas garde sa dernière image et défile avec la page).
-  const scrolling = useTouchScrolling(track);
   const active = pageVisible && slotVisible;
   const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
   return (
@@ -535,7 +541,7 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
         dpr={dpr}
         gl={{ antialias: dpr < 2, alpha: true, powerPreference: 'high-performance' }}
         camera={{ fov: 30, near: 0.05, far: 40, position: [0, 1.4, 3] }}
-        frameloop={!active ? 'never' : scrolling ? 'demand' : 'always'}
+        frameloop={active ? 'always' : 'never'}
         onCreated={({ gl }) => {
           gl.toneMappingExposure = 1.05;
           gl.domElement.addEventListener('webglcontextlost', (e) => {
@@ -550,7 +556,6 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
         </Suspense>
         <AdaptiveDpr max={dpr} min={1} />
         <ClearWhenPaused active={active} />
-        <RenderOnShow active={active} />
       </Canvas>
     </div>
   );
