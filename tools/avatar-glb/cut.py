@@ -1,7 +1,7 @@
 # Sépare bras et corps là où le modèle IA les a soudés (main contre la cuisse, coude et avant-bras contre la taille).
 # Sous l'aisselle : poids francs (bras ou corps), faces de jonction doublées (une copie suit le corps, l'autre le
 # bras : rien ne change au repos), puis les deux bords ouverts sont cousus (bouchons cachés au repos).
-import numpy as np, trimesh, sys
+import numpy as np, trimesh, sys, os
 from collections import defaultdict
 from scipy.spatial import cKDTree
 from sitmeasure import W as W0, names, V as VT, m
@@ -25,6 +25,13 @@ def only(w,keep):
 body=[i for i in range(len(names)) if i not in sum((arm[x] for x in SIDES),[])]
 for v in np.where(low)[0]:
   W[v]=only(Wo[v],arm['LR'[grp[v]-1]] if grp[v]>0 else body) if (only(Wo[v],arm['LR'[grp[v]-1]] if grp[v]>0 else body) is not None) else Wo[v]
+# Au-dessus de la coupe (aisselle, flanc près du coude) : quelques sommets gardaient 5 à 15 % de poids d'avant-bras
+# et partaient en éclats quand l'avant-bras se lève. Ce poids passe au haut du bras (ou au buste).
+for s in SIDES:
+  lo=[ix('la'+s),ix('h'+s)]
+  for v in np.where(~low)[0]:
+    x=W[v,lo].sum()
+    if x>0: W[v,lo]=0; W[v,ix('ua'+s)]+=x
 fg=grp[F]; armin=(fg>0).any(1); bodyin=(fg==0).any(1)
 cut=armin&bodyin&~(fg==-1).all(1)
 print('faces de jonction',cut.sum())
@@ -133,6 +140,11 @@ nearF=np.isin(NF,list(cutv)).any(1)
 cols=np.array([[colat(u) for u in c] for c in NC[nearF]]).reshape(-1,3); uvs=NC[nearF].reshape(-1,2)
 lum=cols@[0.3,0.59,0.11]; dark=lum<0.2; med=np.median(cols[dark],0)
 uvpick=uvs[dark][np.argmin(np.linalg.norm(cols[dark]-med,axis=1))]; print('couleur bouchon',(med*255).round())
+# Bouchon côté flanc : teinte du buste autour de la coupe (plus claire que la manche), sinon il fait une plaque sombre.
+nb_=set(int(v) for v in cutv[grp[cutv]==0])
+nbF=np.array([all((v<len(grp) and grp[v]==0) for v in f) and any(v in nb_ for v in f) for f in NF])
+colsb=np.array([[colat(u) for u in c] for c in NC[nbF]]).reshape(-1,3); uvsb=NC[nbF].reshape(-1,2)
+medb=np.median(colsb,0); uvpick_body=uvsb[np.argmin(np.linalg.norm(colsb-medb,axis=1))]; print('couleur flanc',(medb*255).round())
 for loop in loops:
   sx=1 if NP[loop,0].mean()>0 else -1
   lab=np.array([side_of(v) for v in loop]); n=len(loop)
@@ -147,7 +159,51 @@ for loop in loops:
         for it in range(SMOOTH):
           Q=NP[run].copy()
           for k in mv: NP[run[k]]=0.5*Q[k]+0.25*(Q[k-1]+Q[k+1])
-        zip_strip(run,outward,uvpick,want,sx); print(' bouchon',want,len(run))
+        zip_strip(run,outward,uvpick if want=='arm' else uvpick_body,want,sx); print(' bouchon',want,len(run))
+# Bande du bras le long de la coupe (3 rangs) : la texture IA y avait peint le pli de contact avec le buste (trait sombre
+# en dents de scie) ; on y met la couleur unie du sweat et on lisse la forme, pour que la manche rejoigne le bouchon sans trait.
+RING=int(os.environ.get('RING','4'))
+def isskin(c): return c[0]-c[2]>0.12 and c@[0.3,0.59,0.11]>0.3
+armset=set(int(v) for v in cutv[grp[cutv]>0])|set(dup_arm.values())
+nbf=defaultdict(set)
+for f in NF:
+  for i in range(3): nbf[f[i]].update((f[(i+1)%3],f[(i+2)%3]))
+ring=set(armset); front=set(armset)
+for r in range(RING):
+  nxt_=set()
+  for v in front:
+    for w in nbf[v]:
+      if w not in ring and (w>=len(grp) or grp[w]>0): nxt_.add(w)
+  ring|=nxt_; front=nxt_
+ringl=sorted(ring)
+for fi in range(len(NF)):
+  f=NF[fi]
+  if sum(v in ring for v in f)>=2:
+    hw=np.mean([NW[v][[ix('hL'),ix('hR')]].sum() for v in f])
+    if hw<0.5 or not any(isskin(colat(u)) for u in NC[fi]): NC[fi]=uvpick
+for it in range(int(os.environ.get('RSM','4'))):
+  Q=NP.copy()
+  for v in ringl:
+    if v in armset: continue
+    if nbf[v]: NP[v]=0.5*Q[v]+0.5*Q[list(nbf[v])].mean(0)
+print('bande bras',len(ringl))
+# Même chose côté flanc (zone cachée par l'avant-bras au repos, peinte en pli d'ombre par l'IA).
+RINGB=int(os.environ.get('RINGB','3'))
+bset=set(int(v) for v in cutv[grp[cutv]==0])|set(dup_body.values())
+ringb=set(bset); front=set(bset)
+for r in range(RINGB):
+  nxt_=set()
+  for v in front:
+    for w in nbf[v]:
+      if w not in ringb and (w>=len(grp) or grp[w]==0): nxt_.add(w)
+  ringb|=nxt_; front=nxt_
+rb=sorted(ringb)
+for it in range(int(os.environ.get('RSM','4'))):
+  Q=NP.copy()
+  for v in rb:
+    if v in bset: continue
+    if nbf[v]: NP[v]=0.5*Q[v]+0.5*Q[list(nbf[v])].mean(0)
+print('bande flanc',len(rb))
 # Relaxation des points intérieurs des bouchons (dents de scie du bord) : moyenne des voisins, quelques passes.
 nbc=defaultdict(set)
 for t in capF:
@@ -181,6 +237,10 @@ for t,(want,sx) in zip(capF,capWant):
     if np.linalg.norm(r)>1e-6: CN[remap[v]-len(NP)]=r/np.linalg.norm(r)
 NP=np.vstack([NP,CP]); NW=np.vstack([NW,CW]); NN=np.vstack([NN,CN])
 FT=FT+[3 if w_=='arm' else 4 for (w_,_) in capWant]; NF=np.vstack([NF,capF2]); NC=np.vstack([NC,np.repeat(np.array(capUV)[:,None,:],3,1)])
+import os
+DROP=[int(x) for x in os.environ.get('DROP','').split(',') if x]
+if DROP:
+  keep=~np.isin(np.array(FT),DROP); NF=NF[keep]; NC=NC[keep]; FT=list(np.array(FT)[keep])
 # maillage final : un sommet par (sommet soudé, UV)
 key={}; OP=[];OU=[];ON=[];OW=[];OF=np.zeros_like(NF)
 for fi in range(len(NF)):

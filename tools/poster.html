@@ -69,11 +69,19 @@ if (view === 'typing' || view === 'desk' || view === 'deskfront' || view === 'kb
 } else {
   cam.position.set(0.2, 1.5, 2.75); cam.lookAt(0, 1.36, 0);
 }
+if (q.get('cam')) { const c = q.get('cam').split(',').map(Number), a = (q.get('at') || '0,1,0').split(',').map(Number); cam.position.set(...c); cam.lookAt(...a); }
 await document.fonts.ready;
 setTimeout(() => { renderer.render(scene, cam); document.title = 'ready'; }, 300);
 // Pour filmer une animation image par image (vidéos de contrôle) : window.__frame(t) repose et redessine.
+// &film=1 : salut complet comme sur le site (entrée, 1,9 s, sortie ; t = temps depuis le début du salut).
+const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2), c01 = (x) => Math.min(1, Math.max(0, x));
 window.__frame = (t) => {
-  const Q = makePose(); (seated ? sitPose : q.get('wave') ? (t, P) => wavePoseGlb(t, P, idlePose) : idlePose)(t, Q);
+  const Q = makePose(); (seated ? sitPose : q.get('wave') && !q.get('film') ? (t, P) => wavePoseGlb(t, P, idlePose) : idlePose)(t, Q);
+  if (q.get('film')) {
+    const ww = t < 0 || t > 1.9 ? 0 : ease(c01(t / 0.35)) * ease(c01((1.9 - t) / 0.45));
+    if (ww > 0) { const Wv = makePose(); wavePoseGlb(t, Wv, idlePose); blendWave(Q, Wv, ww); }
+    typeFingers(av, t, 0, ww); av.setSplit?.(ww > 0.15 ? 'R' : 'rest');
+  }
   for (const k of JOINT_KEYS) J[k].rotation.set(...Q[k]);
   av.hips.position.y = Q.hipsY;
   av.head.rotation.y += still ? 0 : 0.18; av.head.rotation.x += still ? 0 : -0.04;
