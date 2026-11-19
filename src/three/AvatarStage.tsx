@@ -437,14 +437,14 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
     return () => io.disconnect();
   }, []);
 
-  // Téléphone et tablette : le canevas n'est plus fixé à l'écran. Il est posé dans la page, du haut de
-  // l'emplacement du hero au bas de celui du bureau, et défile donc avec elle, géré par le navigateur hors
-  // du fil principal. Fixé à l'écran, l'avatar était recalé en JavaScript à chaque image et suivait le
-  // doigt avec un temps de retard : il tremblait au défilement. Ça évite aussi de redimensionner le
-  // canevas quand la barre d'adresse se replie.
+  // Téléphone et tablette : le canevas n'est plus fixé à l'écran. Il est posé dans la page sur
+  // l'emplacement visible (hero, ou bureau plus bas) et défile donc avec elle, géré par le navigateur hors
+  // du fil principal. Fixé à l'écran, l'avatar était recalé en JavaScript à chaque image et tremblait au
+  // défilement. Le canevas ne couvre que cet emplacement (pas toute la hauteur hero → bureau, essayée
+  // d'abord : 2 500 px de haut à composer à chaque image, la page se figeait par moments sur iPhone).
+  // Il change d'emplacement quand on passe la section « À propos », où aucun des deux n'est à l'écran.
   const stageRef = useRef<HTMLDivElement>(null);
   const [track, setTrack] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
-  const [trackH, setTrackH] = useState(0);
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 1023px)');
     const onChange = () => setTrack(mq.matches);
@@ -459,20 +459,39 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
       el.style.height = '';
       return;
     }
+    // Position des deux emplacements dans la page (relue au redimensionnement), boîte posée
+    const boxes = { hero: { top: 0, height: 0 }, desk: { top: 0, height: 0 } };
+    let current = '';
+    let split = 0; // au-delà de cette position de défilement, c'est le bureau qui est à l'écran
+    const place = () => {
+      const mid = window.scrollY + window.innerHeight / 2;
+      const key = mid > split ? 'desk' : 'hero';
+      const b = boxes[key];
+      const sig = `${key}:${b.top}:${b.height}`;
+      if (sig === current || !b.height) return;
+      current = sig;
+      el.style.top = `${b.top}px`;
+      el.style.height = `${b.height}px`;
+    };
     let raf = 0;
     const layout = () => {
       raf = 0;
       const hero = document.querySelector('[data-slot="hero"]');
       const desk = document.querySelector('[data-slot="desk"]');
       if (!hero || !desk) return;
+      const y = window.scrollY;
+      for (const [key, slot] of [['hero', hero], ['desk', desk]] as const) {
+        const r = slot.getBoundingClientRect();
+        // Marge au-dessus : la découpe du rendu déborde de 12 % en haut
+        const top = Math.max(0, Math.round(r.top + y - r.height * 0.15));
+        boxes[key].top = top;
+        boxes[key].height = Math.round(r.bottom + y + 8 - top);
+      }
       const h = hero.getBoundingClientRect();
       const d = desk.getBoundingClientRect();
-      // Marge au-dessus du hero : la découpe du rendu déborde de 12 % en haut
-      const top = Math.max(0, Math.round(h.top + window.scrollY - h.height * 0.15));
-      const height = Math.round(d.bottom + window.scrollY + 8 - top);
-      el.style.top = `${top}px`;
-      el.style.height = `${height}px`;
-      setTrackH(height);
+      split = (h.bottom + d.top) / 2 + y;
+      current = '';
+      place();
     };
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(layout);
@@ -482,18 +501,18 @@ export default function AvatarStage({ onLost }: { onLost: () => void }) {
     const main = document.querySelector('main');
     if (main) ro.observe(main);
     window.addEventListener('resize', schedule);
+    window.addEventListener('scroll', place, { passive: true });
     ScrollTrigger.addEventListener('refresh', schedule);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener('resize', schedule);
+      window.removeEventListener('scroll', place);
       ScrollTrigger.removeEventListener('refresh', schedule);
     };
   }, [track]);
 
-  let dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
-  // Canevas très haut : on reste sous 8 192 pixels de haut (limite des téléphones)
-  if (track && trackH > 0) dpr = Math.max(1, Math.min(dpr, 8000 / trackH));
+  const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.75);
   return (
     <div ref={stageRef} className={`stage${track ? ' stage--track' : ''}`} aria-hidden="true">
       <Canvas
