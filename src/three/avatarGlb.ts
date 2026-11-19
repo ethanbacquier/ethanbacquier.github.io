@@ -50,6 +50,29 @@ export function avatarFromGltf(gltf: GLTF): Avatar {
 type Pose = Record<string, [number, number, number]> & { hipsY: number; breath: number };
 const set = (P: Pose, k: string, x: number, y: number, z: number) => { const a = P[k]; a[0] = x; a[1] = y; a[2] = z; };
 
+const smooth = (x: number) => { const c = Math.min(1, Math.max(0, x)); return c * c * (3 - 2 * c); };
+// Hasard déterministe (même animation à chaque visite, aucune allocation).
+const hash = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+// Rafales de frappe : ~0 pendant les pauses (relire l'écran), ~1 pendant la saisie.
+function typingActivity(t: number) {
+  const n = 0.5 + 0.35 * Math.sin(t * 0.37) + 0.25 * Math.sin(t * 0.91 + 1.3);
+  return smooth((n - 0.3) / 0.25);
+}
+// Pression d'une touche (0 → 1 → 0 en ~0,15 s), à des instants tirés au hasard sur une grille de 0,13 s :
+// rythme irrégulier, jamais mécanique, et décalé d'une main à l'autre (graine différente).
+function keyPress(t: number, seed: number) {
+  const step = 0.13, k = Math.floor(t / step);
+  let d = 0;
+  for (let j = k - 1; j <= k; j++) {
+    if (hash(j * 1.618 + seed) > 0.5) continue;                   // une case sur deux environ : pas de frappe
+    const t0 = (j + 0.7 * hash(j + seed * 3.7)) * step, u = t - t0;
+    if (u < 0 || u > 0.16) continue;
+    const env = u < 0.035 ? u / 0.035 : Math.exp(-(u - 0.035) * 30);  // enfoncée vite, relâchée un peu moins vite
+    d = Math.max(d, env * (0.55 + 0.45 * hash(j * 2.3 + seed)));
+  }
+  return d;
+}
+
 // Assis en train de taper, pour les proportions de ce modèle (grosse tête, bras courts) : buste presque droit,
 // poignets au-dessus du clavier, avant-bras au-dessus du bord du bureau. Angles des bras trouvés par
 // optimisation numérique sur ce squelette (tools/avatar-glb/ik.py, à recalculer si le bureau ou le squelette
@@ -62,18 +85,19 @@ export function sitPoseGlb(t: number, P: Pose) {
   set(P, 'chest', 0.04 + 0.01 * b, 0.03 * Math.sin(t * 0.9), 0);   // le buste suit un peu les mains
   set(P, 'neck', 0.03, 0, 0);
   set(P, 'head', 0.1 + 0.02 * Math.sin(t * 2.1), 0.05 * Math.sin(t * 0.4), 0);
-  for (const [side, sx, ph] of [['L', 1, 0], ['R', -1, 1.7]] as const) {
-    // Frappes : chaque main se soulève puis retombe sur les touches, à un rythme irrégulier et décalé de
-    // l'autre main ; pas de doigts articulés, donc tout le poignet frappe. Les mains glissent aussi sur le
-    // clavier (gauche / droite, avant / arrière) pour ne pas taper toujours au même endroit.
-    const burst = 0.55 + 0.45 * Math.sin(t * 0.8 + ph * 2);                    // phases plus ou moins rapides
-    const lift = Math.pow(0.5 + 0.5 * Math.sin(t * (13 + 2 * sx) + ph), 3) * burst;   // brève levée, retombe vite
-    const slide = 0.07 * Math.sin(t * 0.55 + ph) + 0.03 * Math.sin(t * 1.9 + ph * 3);
-    const reach = 0.06 * Math.sin(t * 0.7 + ph * 2);
+  const act = typingActivity(t);
+  for (const [side, sx, seed] of [['L', 1, 0], ['R', -1, 5.3]] as const) {
+    // Frappe réaliste sans doigts articulés : les mains restent posées au-dessus des touches, chaque touche est
+    // une petite pression rapide du poignet (quelques degrés), à des instants irréguliers, par rafales, avec des
+    // pauses où les mains se reposent. Les mains se déplacent à peine sur le clavier, lentement.
+    const press = act * keyPress(t, seed);
+    const drift = 0.025 * Math.sin(t * 0.31 + seed) + 0.012 * Math.sin(t * 0.83 + seed * 2);
+    const reach = 0.015 * Math.sin(t * 0.47 + seed * 3);
+    const rest = 1 - act;                                    // en pause, poignets un peu plus bas et détendus
     const { ua, la, hand } = SIT_ARM;
-    set(P, 'ua' + side, ua[0] - reach - 0.05 * lift, sx * (ua[1] + slide), sx * ua[2]);
-    set(P, 'la' + side, la[0] - 0.18 * lift + reach, sx * la[1], 0);
-    set(P, 'h' + side, hand[0] - 0.4 * lift, sx * hand[1], sx * hand[2]);
+    set(P, 'ua' + side, ua[0] - reach + 0.02 * rest, sx * (ua[1] + drift), sx * ua[2]);
+    set(P, 'la' + side, la[0] + reach + 0.02 * press, sx * la[1], 0);
+    set(P, 'h' + side, hand[0] + 0.09 * press + 0.05 * rest, sx * (hand[1] + 0.03 * Math.sin(t * 0.6 + seed)), sx * hand[2]);
   }
   set(P, 'ulL', -1.5, 0, 0.04); set(P, 'ulR', -1.5, 0, -0.04);
   set(P, 'llL', 1.45, 0, 0); set(P, 'llR', 1.45, 0, 0);
@@ -105,7 +129,6 @@ export function slerpJoint(a: [number, number, number], b: [number, number, numb
 
 // Entrée et sortie du salut en deux temps : l'avant-bras se plie d'abord (la main remonte devant le buste),
 // puis le bras se lève. Sans ça, le bras tendu passait loin sur le côté, hors de l'emplacement de l'avatar.
-const smooth = (x: number) => { const c = Math.min(1, Math.max(0, x)); return c * c * (3 - 2 * c); };
 export function blendWave(idle: Pose, wave: Pose, ww: number) {
   const fold = smooth(ww / 0.45), lift = smooth((ww - 0.3) / 0.7);
   slerpJoint(idle.laR, wave.laR, fold);

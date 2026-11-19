@@ -8,6 +8,7 @@ Outils lancés une fois (pas dans le build). Python 3 avec `trimesh numpy scipy 
    - `python3 streak.py doux.glb meche.glb 0.004` : la mèche blanche repeinte sur tout son relief ;
    - `python3 clothfix2.py meche.glb propre.glb 0.26` : taches claires du sweat sous les bras (zones cachées que les bras dévoilent en bougeant).
 3. **Poids du squelette** : `python3 -c "import sys;sys.argv=['x','--','propre.glb','poids.npz'];exec(open('bl_weights.py').read())"` (os de `joints.py`, chaleur de Blender après fusion des sommets).
-4. **Squelette dans le GLB** : `python3 bake.py propre.glb poids.npz avatar-rig.glb`. Os aux noms de `avatar.js`, rotations nulles au repos, mis à l'échelle (pieds à 0, bassin à 0,667).
-5. **Compression** : `npx @gltf-transform/cli optimize avatar-rig.glb avatar.glb --no-simplify --texture-size 2048 --texture-compress webp --compress meshopt`.
-6. **Pose assise** : `python3 ik.py` calcule les angles des bras (`SIT_ARM` dans `src/three/avatarGlb.ts`) pour que les poignets tombent sur le clavier du bureau.
+4. **Bras séparés du corps** : `python3 cut.py 1.0 coupe.glb 15` (lit le modèle et `w_heat.npz` comme `sitmeasure.py`, écrit `w_cut.npz`). Le modèle IA soude la main à la cuisse et l'avant-bras à la taille : bras levé, ces faces s'étiraient en « filet » et montraient la peau. Sous l'aisselle (y < 1,0), poids francs, faces de jonction doublées (une copie suit le corps, l'autre le bras, rien ne change au repos) et bords cousus (bouchons couleur sweat, cachés au repos).
+5. **Squelette dans le GLB** : `python3 bake.py coupe.glb w_cut.npz avatar-rig.glb`. Os aux noms de `avatar.js`, rotations nulles au repos, mis à l'échelle (pieds à 0, bassin à 0,667).
+6. **Compression** : `npx @gltf-transform/cli optimize avatar-rig.glb avatar.glb --no-simplify --texture-size 2048 --texture-compress webp --compress meshopt`.
+7. **Pose assise** : `python3 ik.py` calcule les angles des bras (`SIT_ARM` dans `src/three/avatarGlb.ts`) pour que les poignets tombent sur le clavier du bureau.

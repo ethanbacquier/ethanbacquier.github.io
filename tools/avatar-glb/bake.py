@@ -11,9 +11,13 @@ P=np.frombuffer(blob,np.float32,acc.count*3,(bv.byteOffset or 0)+(acc.byteOffset
 # mesh node world transform: assume identity-ish; check
 mn=[i for i,n in enumerate(g.nodes) if n.mesh is not None][0]
 print('mesh node',g.nodes[mn])
-tree=cKDTree(d['co']); dist,idx=tree.query(P,k=3)
-w=1/(dist+1e-5); w/=w.sum(1,keepdims=True)
-W=(d['W'][idx]*w[...,None]).sum(1)
+if len(d['co'])==len(P) and np.abs(d['co']-P).max()<1e-6:
+  W=d['W'].astype(np.float64)   # poids donnés sommet par sommet (cut2.py : copies superposées aux poids différents)
+else:
+ tree=cKDTree(d['co']); dist,idx=tree.query(P,k=3)
+
+ w=1/(dist+1e-5); w/=w.sum(1,keepdims=True)
+ W=(d['W'][idx]*w[...,None]).sum(1)
 K=0.667/0.68
 def T(p): p=np.asarray(p,np.float64); return np.stack([p[...,0]*K,(p[...,1]+0.32)*K+0.667,(p[...,2]+0.03)*K],-1)
 

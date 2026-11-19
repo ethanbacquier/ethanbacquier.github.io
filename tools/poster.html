@@ -29,7 +29,7 @@ av.setGaze(+(q.get('gaze') || 0), 0);
 av.setBlink(+(q.get('blink') ?? 1));
 av.setSmile(+(q.get('smile') || 0));
 const J = { hips: av.hips, spine: av.spine, chest: av.chest, neck: av.neck, head: av.head, uaL: av.arms.L.ua, uaR: av.arms.R.ua, laL: av.arms.L.la, laR: av.arms.R.la, hL: av.arms.L.hand, hR: av.arms.R.hand, ulL: av.legs.L.ul, ulR: av.legs.R.ul, llL: av.legs.L.ll, llR: av.legs.R.ll, fL: av.legs.L.foot, fR: av.legs.R.foot };
-const seated = view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'deskside';
+const seated = view === 'typing' || view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'deskside';
 const T = +(q.get('t') || 0.6);
 const P = makePose(); (seated ? sitPose : q.get('wave') ? (t, P) => wavePoseGlb(t, P, idlePose) : idlePose)(T, P);
 if (q.get('wv')) Object.assign(P, JSON.parse(q.get('wv')));
@@ -41,11 +41,12 @@ typeFingers(av, T, seated ? 1 : 0, q.get('wave') ? 1 : 0);
 const still = view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'face' || view === 'head';
 av.head.rotation.y += still ? 0 : 0.18; av.head.rotation.x += still ? 0 : -0.04;
 const cam = new THREE.PerspectiveCamera(30, W / H, 0.05, 40);
-if (view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'deskside') {
+if (view === 'typing' || view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'deskside') {
   const d = buildDesk(); scene.add(d.group); d.screen.draw();
   cam.position.set(2.75, 1.73, -0.95).sub(new THREE.Vector3(0.05, 0.94, 0.3)).normalize().multiplyScalar(4.25).add(new THREE.Vector3(0.05, 0.94, 0.3));
   cam.lookAt(0.05, 0.94, 0.3);
   if (view === 'kb') { cam.position.set(-0.55, 1.05, 0.05); cam.lookAt(-0.05, 0.6, 0.45); }
+  if (view === 'typing') { cam.position.set(-1.45, 1.5, 0.78); cam.lookAt(0, 0.74, 0.4); }
   if (view === 'deskside') { cam.position.set(-1.6, 0.82, 0.42); cam.lookAt(0, 0.76, 0.42); }
   if (view === 'deskfront') { cam.position.set(-1.6, 1.5, 2.4); cam.lookAt(0, 0.6, 0.4); }
 } else if (view === 'full') {
@@ -69,4 +70,12 @@ if (view === 'desk' || view === 'deskfront' || view === 'kb' || view === 'desksi
 }
 await document.fonts.ready;
 setTimeout(() => { renderer.render(scene, cam); document.title = 'ready'; }, 300);
+// Pour filmer une animation image par image (vidéos de contrôle) : window.__frame(t) repose et redessine.
+window.__frame = (t) => {
+  const Q = makePose(); (seated ? sitPose : q.get('wave') ? (t, P) => wavePoseGlb(t, P, idlePose) : idlePose)(t, Q);
+  for (const k of JOINT_KEYS) J[k].rotation.set(...Q[k]);
+  av.hips.position.y = Q.hipsY;
+  av.head.rotation.y += still ? 0 : 0.18; av.head.rotation.x += still ? 0 : -0.04;
+  renderer.render(scene, cam);
+};
 </script></body></html>
