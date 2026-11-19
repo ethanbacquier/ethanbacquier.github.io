@@ -52,8 +52,9 @@ const set = (P: Pose, k: string, x: number, y: number, z: number) => { const a =
 
 // Assis en train de taper, pour les proportions de ce modèle (grosse tête, bras courts) : buste presque droit,
 // poignets au-dessus du clavier, avant-bras au-dessus du bord du bureau. Angles des bras trouvés par
-// optimisation numérique sur ce squelette (à recalculer si le bureau ou le squelette changent).
-const SIT_ARM = { ua: [-1.007, -0.196, -0.352], la: [-0.31, -0.172], hand: [0.129, 0.077, 0.332] };
+// optimisation numérique sur ce squelette (tools/avatar-glb/ik.py, à recalculer si le bureau ou le squelette
+// changent) ; hauteurs mesurées sur le maillage déformé (tools/avatar-glb/sitmeasure.py).
+const SIT_ARM = { ua: [-0.984, -0.229, -0.345], la: [-0.615, -0.19], hand: [0.187, 0.099, 0.336] };
 export function sitPoseGlb(t: number, P: Pose) {
   const b = Math.sin(t * 1.7);
   const tapL = Math.max(0, Math.sin(t * 12.3) * Math.sin(t * 3.7 + 1));
@@ -73,16 +74,38 @@ export function sitPoseGlb(t: number, P: Pose) {
   set(P, 'ulL', -1.5, 0, 0.04); set(P, 'ulR', -1.5, 0, -0.04);
   set(P, 'llL', 1.45, 0, 0); set(P, 'llR', 1.45, 0, 0);
   set(P, 'fL', 0.05, 0, 0); set(P, 'fR', 0.05, 0, 0);
-  P.hipsY = 0.37;
+  P.hipsY = 0.435;   // fesses et cuisses sur l'assise (DESK_LAYOUT.seat), pieds au sol
   P.breath = b;
 }
 
-// Salut : main droite levée à côté du visage (la grosse tête cachait la main du salut de l'ancien avatar).
+// Salut : main droite levée au-dessus de l'épaule, à côté de la tête (la grosse tête cachait la main du salut
+// de l'ancien avatar, et un bras écarté sortait de l'emplacement pendant la montée).
 export function wavePoseGlb(t: number, P: Pose, idle: (t: number, P: Pose) => void) {
   idle(t, P);
   const swing = Math.sin(t * 9);
-  set(P, 'uaR', -1.2, 0.3 + 0.08 * swing, -0.9);
-  set(P, 'laR', -1.1, 0, -0.25 + 0.2 * swing);   // balancement surtout vers l'extérieur : la main ne touche pas la joue
-  set(P, 'hR', 0.2, 0, 0.12 * swing);
+  set(P, 'uaR', -2.3, 0.06 * swing, -0.35);                       // bras levé devant l'épaule, coude près du corps
+  set(P, 'laR', -0.9, 0, -0.15 + 0.2 * swing);   // balancement surtout vers l'extérieur : la main ne touche pas la tête
+  set(P, 'hR', 0.1, 0, 0.12 * swing);
   set(P, 'head', P.head[0], P.head[1], P.head[2] - 0.05);
+}
+
+// Mélange de deux rotations par le plus court chemin (quaternions) : un mélange angle par angle faisait passer
+// le bras du salut très loin sur le côté, hors du cadre, en étirant l'aisselle. Écrit le résultat dans a.
+const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), ea = new THREE.Euler(), eb = new THREE.Euler();
+export function slerpJoint(a: [number, number, number], b: [number, number, number], w: number) {
+  qa.setFromEuler(ea.set(a[0], a[1], a[2]));
+  qb.setFromEuler(eb.set(b[0], b[1], b[2]));
+  ea.setFromQuaternion(qa.slerp(qb, w));
+  a[0] = ea.x; a[1] = ea.y; a[2] = ea.z;
+}
+
+// Entrée et sortie du salut en deux temps : l'avant-bras se plie d'abord (la main remonte devant le buste),
+// puis le bras se lève. Sans ça, le bras tendu passait loin sur le côté, hors de l'emplacement de l'avatar.
+const smooth = (x: number) => { const c = Math.min(1, Math.max(0, x)); return c * c * (3 - 2 * c); };
+export function blendWave(idle: Pose, wave: Pose, ww: number) {
+  const fold = smooth(ww / 0.45), lift = smooth((ww - 0.3) / 0.7);
+  slerpJoint(idle.laR, wave.laR, fold);
+  slerpJoint(idle.hR, wave.hR, fold);
+  slerpJoint(idle.uaR, wave.uaR, lift);
+  slerpJoint(idle.head, wave.head, ww);
 }

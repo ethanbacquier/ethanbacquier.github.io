@@ -12,7 +12,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { buildDesk, buildLights, JOINT_KEYS, makePose, idlePose, typeFingers } from '/src/three/avatar.js';
-import { AVATAR_GLB, avatarFromGltf, sitPoseGlb as sitPose, wavePoseGlb } from '/src/three/avatarGlb.ts';
+import { AVATAR_GLB, avatarFromGltf, sitPoseGlb as sitPose, blendWave, wavePoseGlb } from '/src/three/avatarGlb.ts';
 const q = new URLSearchParams(location.search);
 const view = q.get('view') || 'bust', W = +(q.get('w') || 900), H = +(q.get('h') || 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -32,6 +32,9 @@ const J = { hips: av.hips, spine: av.spine, chest: av.chest, neck: av.neck, head
 const seated = view === 'desk' || view === 'deskfront' || view === 'kb';
 const T = +(q.get('t') || 0.6);
 const P = makePose(); (seated ? sitPose : q.get('wave') ? (t, P) => wavePoseGlb(t, P, idlePose) : idlePose)(T, P);
+if (q.get('wv')) Object.assign(P, JSON.parse(q.get('wv')));
+// &ww=0.5 : salut à mi-chemin (même mélange que dans AvatarStage.tsx)
+if (q.get('ww')) { const I = makePose(); idlePose(T, I); const w = +q.get('ww'); blendWave(I, P, w); for (const k of ['uaR', 'laR', 'hR', 'head']) P[k] = I[k]; }
 for (const k of JOINT_KEYS) J[k].rotation.set(...P[k]);
 av.hips.position.y = P.hipsY;
 typeFingers(av, T, seated ? 1 : 0, q.get('wave') ? 1 : 0);
@@ -40,8 +43,8 @@ av.head.rotation.y += still ? 0 : 0.18; av.head.rotation.x += still ? 0 : -0.04;
 const cam = new THREE.PerspectiveCamera(30, W / H, 0.05, 40);
 if (view === 'desk' || view === 'deskfront' || view === 'kb') {
   const d = buildDesk(); scene.add(d.group); d.screen.draw();
-  cam.position.set(2.75, 1.65, -0.95).sub(new THREE.Vector3(0.05, 0.86, 0.3)).normalize().multiplyScalar(4.1).add(new THREE.Vector3(0.05, 0.86, 0.3));
-  cam.lookAt(0.05, 0.86, 0.3);
+  cam.position.set(2.75, 1.73, -0.95).sub(new THREE.Vector3(0.05, 0.94, 0.3)).normalize().multiplyScalar(4.25).add(new THREE.Vector3(0.05, 0.94, 0.3));
+  cam.lookAt(0.05, 0.94, 0.3);
   if (view === 'kb') { cam.position.set(-0.55, 1.05, 0.05); cam.lookAt(-0.05, 0.6, 0.45); }
   if (view === 'deskfront') { cam.position.set(-1.6, 1.5, 2.4); cam.lookAt(0, 0.6, 0.4); }
 } else if (view === 'full') {

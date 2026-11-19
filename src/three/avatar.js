@@ -760,7 +760,10 @@ export function buildLights() {
 
 // Bureau : plateau épais aux bords arrondis sur deux pieds en cadre métal, tapis de bureau, clavier à
 // vraies touches (une seule InstancedMesh), souris, mug, écran fin sur pied à plaque, chaise de bureau.
-// Le clavier reste à l'endroit où tombent les mains de la pose assise (sitPose).
+// Le clavier reste à l'endroit où tombent les mains de la pose assise (sitPoseGlb dans avatarGlb.ts).
+// Hauteurs réglées le 19/11 sur l'avatar IA (grosse tête, jambes courtes, cuisses épaisses) : plateau plus
+// haut pour que les genoux passent dessous, assise plus basse pour que les pieds touchent le sol.
+export const DESK_LAYOUT = { top: 0.67, seat: 0.2, monitor: 0.08 };
 export function buildDesk() {
   const g = new THREE.Group();
   const wood = std(0x2A2328, 0.55);
@@ -770,12 +773,13 @@ export function buildDesk() {
   const fabricSeat = fabric(0x24212B);
 
   // Plateau et pieds (cadre en U inversé de chaque côté + traverse)
-  const TOP_Y = 0.58;
+  const TOP_Y = DESK_LAYOUT.top, LEG = TOP_Y - 0.02;
+  const DY = TOP_Y - 0.58 + DESK_LAYOUT.monitor;   // écran : suit le plateau, plus haut pour la grosse tête
   g.add(mesh(new RoundedBoxGeometry(1.3, 0.035, 0.62, 4, 0.014), wood, { p: [0, TOP_Y, 0.62] }));
   const tube = (len) => new RoundedBoxGeometry(0.035, len, 0.035, 2, 0.012);
   [-0.58, 0.58].forEach((x) => {
-    g.add(mesh(tube(0.56), metal, { p: [x, 0.28, 0.4] }));
-    g.add(mesh(tube(0.56), metal, { p: [x, 0.28, 0.84] }));
+    g.add(mesh(tube(LEG), metal, { p: [x, LEG / 2, 0.4] }));
+    g.add(mesh(tube(LEG), metal, { p: [x, LEG / 2, 0.84] }));
     g.add(mesh(new RoundedBoxGeometry(0.035, 0.035, 0.5, 2, 0.012), metal, { p: [x, 0.018, 0.62] }));   // patin au sol
     g.add(mesh(new RoundedBoxGeometry(0.035, 0.03, 0.5, 2, 0.012), metal, { p: [x, TOP_Y - 0.035, 0.62] }));
   });
@@ -861,16 +865,16 @@ export function buildDesk() {
 
   // Écran : pied à plaque, colonne, dalle fine avec dos arrondi
   g.add(mesh(new RoundedBoxGeometry(0.22, 0.012, 0.15, 3, 0.005), metal, { p: [0, TOP_Y + 0.024, 0.8] }));
-  g.add(mesh(new RoundedBoxGeometry(0.04, 0.24, 0.018, 2, 0.007), metal, { p: [0, TOP_Y + 0.14, 0.84], r: [0.12, 0, 0] }));
-  g.add(mesh(new RoundedBoxGeometry(0.64, 0.39, 0.016, 3, 0.006), plastic, { p: [0, 0.9, 0.818] }));
-  g.add(mesh(new RoundedBoxGeometry(0.4, 0.24, 0.03, 4, 0.012), plastic, { p: [0, 0.89, 0.83] }));   // bosse arrière
+  g.add(mesh(new RoundedBoxGeometry(0.04, 0.24 + DESK_LAYOUT.monitor, 0.018, 2, 0.007), metal, { p: [0, TOP_Y + 0.14 + DESK_LAYOUT.monitor / 2, 0.84], r: [0.12, 0, 0] }));
+  g.add(mesh(new RoundedBoxGeometry(0.64, 0.39, 0.016, 3, 0.006), plastic, { p: [0, 0.9 + DY, 0.818] }));
+  g.add(mesh(new RoundedBoxGeometry(0.4, 0.24, 0.03, 4, 0.012), plastic, { p: [0, 0.89 + DY, 0.83] }));   // bosse arrière
   const screen = makeTerminal();
   const plane = new THREE.Mesh(new THREE.PlaneGeometry(0.616, 0.366), new THREE.MeshBasicMaterial({ map: screen.texture, toneMapped: false }));
-  plane.position.set(0, 0.902, 0.8095);
+  plane.position.set(0, 0.902 + DY, 0.8095);
   plane.rotation.y = Math.PI;
   g.add(plane);
   const screenLight = new THREE.PointLight(0x9F7BFF, 1.6, 2.2, 1.5);
-  screenLight.position.set(0, 0.95, 0.65);
+  screenLight.position.set(0, 0.95 + DY, 0.65);
   g.add(screenLight);
 
   // Chaise : assise et dossier galbés, accoudoirs, vérin, pied étoile à roulettes
@@ -884,14 +888,15 @@ export function buildDesk() {
     geo.computeVertexNormals();
     return geo;
   };
-  g.add(mesh(seatShape(0.44, 0.42, 0.065, 0.015), fabricSeat, { p: [0, 0.26, -0.02] }));
-  g.add(mesh(seatShape(0.42, 0.46, 0.055, 0.02), fabricSeat, { p: [0, 0.58, -0.26], r: [Math.PI / 2 - 0.12, 0, 0] }));
-  g.add(mesh(new RoundedBoxGeometry(0.05, 0.3, 0.02, 2, 0.008), metal, { p: [0, 0.38, -0.25], r: [-0.12, 0, 0] }));   // liaison dossier
+  const SY = DESK_LAYOUT.seat - 0.26;   // assise, dossier et accoudoirs ; le vérin s'adapte, le pied reste au sol
+  g.add(mesh(seatShape(0.44, 0.42, 0.065, 0.015), fabricSeat, { p: [0, 0.26 + SY, -0.02] }));
+  g.add(mesh(seatShape(0.42, 0.46, 0.055, 0.02), fabricSeat, { p: [0, 0.58 + SY, -0.26], r: [Math.PI / 2 - 0.12, 0, 0] }));
+  g.add(mesh(new RoundedBoxGeometry(0.05, 0.3, 0.02, 2, 0.008), metal, { p: [0, 0.38 + SY, -0.25], r: [-0.12, 0, 0] }));   // liaison dossier
   [-1, 1].forEach((sx) => {
-    g.add(mesh(new RoundedBoxGeometry(0.025, 0.15, 0.025, 2, 0.01), metal, { p: [sx * 0.24, 0.34, -0.06] }));
-    g.add(mesh(new RoundedBoxGeometry(0.05, 0.022, 0.22, 3, 0.01), plastic, { p: [sx * 0.24, 0.42, -0.02] }));
+    g.add(mesh(new RoundedBoxGeometry(0.025, 0.15, 0.025, 2, 0.01), metal, { p: [sx * 0.24, 0.34 + SY, -0.06] }));
+    g.add(mesh(new RoundedBoxGeometry(0.05, 0.022, 0.22, 3, 0.01), plastic, { p: [sx * 0.24, 0.42 + SY, -0.02] }));
   });
-  g.add(mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.17, 16), metal, { p: [0, 0.14, -0.02] }));
+  g.add(mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.17 + SY, 16), metal, { p: [0, 0.14 + SY / 2, -0.02] }));
   g.add(mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), plastic, { p: [0, 0.06, -0.02] }));
   for (let i = 0; i < 5; i++) {
     const a = (i / 5) * Math.PI * 2;

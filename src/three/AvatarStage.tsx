@@ -12,7 +12,7 @@ import { stageState } from '../lib/stageState';
 import { markWebGLLost } from '../lib/capabilities';
 import { usePageVisible } from '../lib/hooks';
 import { Warmup } from './Warmup';
-import { AVATAR_GLB, avatarFromGltf, sitPoseGlb, wavePoseGlb } from './avatarGlb';
+import { AVATAR_GLB, avatarFromGltf, blendWave, sitPoseGlb, wavePoseGlb } from './avatarGlb';
 import { AdaptiveDpr } from './AdaptiveDpr';
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -20,7 +20,7 @@ type Framing = { center: THREE.Vector3; height: number; width: number; dir: THRE
 
 const BUST: Framing = { center: new THREE.Vector3(0, 1.36, 0), height: 1.12, width: 0.86, dir: new THREE.Vector3(0.0, 0.08, 1).normalize() };
 const ABOUT: Framing = { center: new THREE.Vector3(0, 1.36, 0), height: 1.26, width: 0.8, dir: new THREE.Vector3(0.18, 0.1, 1).normalize() };
-const DESK: Framing = { center: new THREE.Vector3(0.05, 0.86, 0.3), height: 1.55, width: 1.6, dir: new THREE.Vector3(2.65, 0.8, -1.27).normalize() };
+const DESK: Framing = { center: new THREE.Vector3(0.05, 0.94, 0.3), height: 1.62, width: 1.6, dir: new THREE.Vector3(2.65, 0.8, -1.27).normalize() };
 
 const debug = typeof window !== 'undefined' && window.location.search.includes('debug');
 const debugInfo: Record<string, unknown> = {};
@@ -48,7 +48,6 @@ function lerpRect(a: Rect, b: Rect, t: number, out: Rect) {
 }
 
 const WAVE_TIME = 1.9;
-const WAVE_KEYS = ['uaR', 'laR', 'hR', 'head'];
 const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Fondu au bas de l'emplacement (hero et À propos) : bande collée à la caméra, dessinée en dernier,
@@ -290,10 +289,7 @@ function Scene() {
     const ww = wt < 0 || wt > WAVE_TIME ? 0 : ease(clamp01(wt / 0.35)) * ease(clamp01((WAVE_TIME - wt) / 0.45));
     if (ww > 0) {
       wavePoseGlb(t, s.poseWave, idlePose);
-      for (const k of WAVE_KEYS) {
-        const a = s.poseIdle[k], b = s.poseWave[k];
-        a[0] = lerp(a[0], b[0], ww); a[1] = lerp(a[1], b[1], ww); a[2] = lerp(a[2], b[2], ww);
-      }
+      blendWave(s.poseIdle, s.poseWave, ww);
     }
     for (const k of JOINT_KEYS) {
       const a = s.poseIdle[k];
