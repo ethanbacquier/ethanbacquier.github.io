@@ -281,6 +281,13 @@ main {
   height: 100%;
   will-change: transform;
 }
+/* Écran tactile : hauteur maximale de l'écran, la grille ne bouge pas quand la barre d'adresse se replie */
+@media (pointer: coarse) {
+  .backdrop__grid {
+    bottom: auto;
+    height: 100lvh;
+  }
+}
 /* Grain fixe (bruit SVG en niveaux de gris) : texture discrète, et plus de bandes dans les dégradés */
 .backdrop__grain {
   position: absolute;
