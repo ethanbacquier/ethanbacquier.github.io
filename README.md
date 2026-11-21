@@ -1,6 +1,6 @@
 # Portfolio · Ethan Bacquier
 
-Portfolio d'Ethan Bacquier, étudiant en B2 cybersécurité à Ynov Lyon, à la recherche d'un stage de 170 h.
+Portfolio d'Ethan Bacquier, étudiant en B2 cybersécurité à Ynov Lyon, à la recherche d'un stage de 175 h.
 
 Le site est construit avec Vite, React 18, TypeScript et Three.js (React Three Fiber). L'animation passe par GSAP + ScrollTrigger, le défilement doux par Lenis. Tout est statique : il est publié sur GitHub Pages (https://ethanbacquier.github.io) et peut aussi se déployer sur Cloudflare Pages ou Netlify.
 
@@ -95,9 +95,9 @@ Le script (Playwright) produit 5 PDF d'une page :
 | Fichier | Style | Accroche |
 |---|---|---|
 | `public/cv/ethan-bacquier-cv.pdf` | assorti au site | stage + alternance (bouton « CV » du site) |
-| `cv/ethan-bacquier-cv-stage.pdf` | assorti au site | stage de 170 h |
+| `cv/ethan-bacquier-cv-stage.pdf` | assorti au site | stage de 175 h |
 | `cv/ethan-bacquier-cv-alternance.pdf` | assorti au site | alternance B3 |
-| `cv/ethan-bacquier-cv-ats-stage.pdf` | sobre, lisible par les logiciels de tri (ATS) | stage de 170 h |
+| `cv/ethan-bacquier-cv-ats-stage.pdf` | sobre, lisible par les logiciels de tri (ATS) | stage de 175 h |
 | `cv/ethan-bacquier-cv-ats-alternance.pdf` | sobre (ATS) | alternance B3 |
 
 Un avertissement s'affiche si une version dépasse une page A4 : raccourcis alors un texte.

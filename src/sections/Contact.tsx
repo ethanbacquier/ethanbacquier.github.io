@@ -18,7 +18,7 @@ import { revealFade } from '../lib/reveal';
 import { SplitHeading } from '../components/SplitHeading';
 
 const SUBJECTS = [
-  { value: 'stage', label: 'Stage 170 h' },
+  { value: 'stage', label: 'Stage 175 h' },
   { value: 'alternance', label: 'Alternance B3' },
   { value: 'autre', label: 'Autre' },
 ];
@@ -204,7 +204,7 @@ export function Contact() {
               <p className="label">Écris-moi directement</p>
               <p className="contact__direct-mail">{profile.email}</p>
               <div className="contact__direct-actions">
-                <a className="btn btn--primary" href={`mailto:${profile.email}?subject=${encodeURIComponent('Stage 170 h')}`}>
+                <a className="btn btn--primary" href={`mailto:${profile.email}?subject=${encodeURIComponent('Stage 175 h')}`}>
                   Écrire un e-mail <IconArrow aria-hidden="true" />
                 </a>
                 <button type="button" className="btn btn--ghost" onClick={() => copyText(profile.email, 'Adresse copiée ✓')}>

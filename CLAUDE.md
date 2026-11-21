@@ -20,7 +20,7 @@ Ce fichier est la référence du projet. Il reprend le brief initial **et** les 
 
 ## 1. Mission
 
-Portfolio personnel d'**Ethan Bacquier** (pseudo **Tatoune**), étudiant en 2e année de cybersécurité (B2) à **Ynov Lyon**, qui cherche un **stage de 170 h**. Objectif : donner envie à un recruteur cyber/infra de le contacter en moins de 2 minutes.
+Portfolio personnel d'**Ethan Bacquier** (pseudo **Tatoune**), étudiant en 2e année de cybersécurité (B2) à **Ynov Lyon**, qui cherche un **stage de 175 h**. Objectif : donner envie à un recruteur cyber/infra de le contacter en moins de 2 minutes.
 
 Référence = adaptation inspirée, **pas une copie** : mise en scène d'un portfolio de « creative developer » (avatar 3D cartoon qui suit la souris, fond noir à lueur violette, perso qui finit assis à un bureau, timeline lumineuse) + section compétences en clavier 3D de keycaps (second portfolio). Identité, textes, assets et code 100 % originaux. Aucun nom, texte, logo ou asset des références. Les filigranes TikTok / « @lusi.uxui » de la vidéo source ne font pas partie du design.
 
@@ -114,8 +114,8 @@ Tout le texte modifiable sans toucher au code.
 ### 4.1 profile.json
 - Nom : **Ethan Bacquier** · pseudo **Tatoune**
 - Statut : **Étudiant en B2 Cybersécurité · Ynov Campus Lyon (2026–2027)** (`status`, utilisé dans `llms.txt`) ; version courte du hero `heroStatus` : « B2 · Ynov Campus Lyon · 2026–27 » (évite de répéter « Étudiant en cybersécurité » juste sous le mot rotatif)
-- Badge du hero : « Stage 170 h dès nov. 2026 · Alternance B3 en 2027 » (affiché sur 2 lignes, coupé sur « · »)
-- Recherche : stage de 170 h cette année **et** alternance en B3 (rentrée 2027, rythme **1 semaine à l'école / 2 semaines en entreprise**). Les recruteurs s'intéressent souvent plus aux alternants : l'alternance est mise en avant (badge, Disponibilités, timeline, formulaire).
+- Badge du hero : « Stage 175 h dès nov. 2026 · Alternance B3 en 2027 » (affiché sur 2 lignes, coupé sur « · »)
+- Recherche : stage de 175 h cette année **et** alternance en B3 (rentrée 2027, rythme **1 semaine à l'école / 2 semaines en entreprise**). Les recruteurs s'intéressent souvent plus aux alternants : l'alternance est mise en avant (badge, Disponibilités, timeline, formulaire).
 - Intérêts : cybersécurité (labs THM / HTB) et infra. Niveau dev : les bases (dit par Ethan le 31/10), ne jamais le présenter comme développeur confirmé. **Ne jamais écrire sur le site que ses projets ont été faits avec l'IA** (demande d'Ethan du 01/11) : l'IA apparaît seulement comme une compétence (touche Claude Code). **Plus aucune mention de DFIR / CTI / threat intel** (demande d'Ethan du 31/10 : il n'en a jamais fait). « À propos » et la carte « Cybersécurité » réécrits le 31/10 sur cette base.
 - Niveau (à respecter dans tous les textes) : bases solides en infra/cyber et plusieurs langages ; **pas encore de certification** ; ne jamais gonfler.
 - Email : `ethan.bacquier@gmail.com` (bouton copier + mailto)
@@ -132,7 +132,7 @@ Tout le texte modifiable sans toucher au code.
 ### 4.2 timeline.json (Ynov uniquement)
 1. **Bachelor 1 Informatique** · Ynov Lyon · 2025–26 · « Bases du développement, des systèmes et des réseaux. Premiers projets en Go et en web. » *(wording à valider par Ethan)*
 2. **Bachelor 2 Cybersécurité** · Ynov Lyon · 2026–27 · « Spécialisation cyber : sécurité des systèmes et des réseaux, sécurité offensive en lab. En parallèle : TryHackMe et Hack The Box. »
-3. **Stage · 170 h** · « Et si c'était chez vous ? » · 2026–27 · « Je cherche un stage en cybersécurité ou en infra, les matins (8h–12h) et à temps plein pendant les vacances. » + lien « Voir mes disponibilités ↓ ». Style « à venir » : année en dégradé lavande qui s’efface vers le bas (plus de contour `-webkit-text-stroke` depuis le 30/10 : sur iPhone, la police système faisait apparaître des traits dans les « 2 »), perle qui pulse.
+3. **Stage · 175 h** · « Et si c'était chez vous ? » · 2026–27 · « Je cherche un stage en cybersécurité ou en infra, les matins (8h–12h) et à temps plein pendant les vacances. » + lien « Voir mes disponibilités ↓ ». Style « à venir » : année en dégradé lavande qui s’efface vers le bas (plus de contour `-webkit-text-stroke` depuis le 30/10 : sur iPhone, la police système faisait apparaître des traits dans les « 2 »), perle qui pulse.
 4. **Alternance · Bachelor 3** · « Prochaine étape » · 2027–28 · « Objectif : continuer en alternance en B3, au rythme de 1 semaine à l'école et 2 semaines en entreprise. » Style « à venir » (plus en version discrète depuis le 17/10 au soir).
 
 ### 4.3 training.json (stats relevées le 17 oct. 2026, mises à jour le 1er nov. 2026, mises à jour à la main)
@@ -377,7 +377,7 @@ Budget : qualité d'abord, optimisation après mesure sur le PC d'Ethan. **Refon
 3 colonnes desktop, avatar au centre (buste, épaules → haut du crâne), lueur radiale derrière.
 - Gauche : « Salut, moi c'est » (`--accent`) puis « Ethan / Bacquier » (h1 unique, police système 800, `clamp(2.6rem, 6vw, 5.6rem)`, `-0.04em`, colonne gauche élargie : grille `1.1fr / 1.15fr / 0.92fr`)
 - Droite : « Étudiant en » puis mot rotatif « CYBERSÉCURITÉ » ↔ « INFRA ». Sortant : monte de 100 % dans un masque en passant en `--accent` et en perdant l'opacité ; entrant : arrive du bas en `--text`. Cycle 2.6 s, `power3.inOut` 0.7 s. `aria-live="off"` + span sr-only « Étudiant en cybersécurité et infrastructure ».
-- Badge : « ● Stage 170 h dès nov. 2026 / Alternance B3 en 2027 » (2 lignes, 2e en `--accent`, point vert doux qui pulse) → scroll vers Disponibilités
+- Badge : « ● Stage 175 h dès nov. 2026 / Alternance B3 en 2027 » (2 lignes, 2e en `--accent`, point vert doux qui pulse) → scroll vers Disponibilités
 - Sous le badge : boutons « Me contacter » (plein) et « Voir mes projets » (contour). Un 3e bouton « CV » quand `cv.available` passera à `true`.
 - Avatar : idle qui respire. **Tête** suit le pointeur (os `Head` : yaw ±35°, pitch ±20°, lerp 0.08), yeux aussi si os disponibles. Tactile : balayage lent automatique.
 - Intro GSAP : lueur (scale 0.6 → 1), avatar +40 px en fondu, nom mot par mot (stagger 0.08), colonne droite, badge. Nav et badge utilisables pendant l'intro.
@@ -435,17 +435,17 @@ Grille de tuiles en verre (`.tiles`, 4 colonnes, 2 sur mobile, `grid-auto-flow: 
 
 ### 9. Disponibilités
 « QUAND » / « JE SUIS DISPO ».
-- Gauche : « Stage de 170 h » · « Les matins en semaine · 8h–12h » · « À temps plein pendant les vacances » · « Lyon ou télétravail »
+- Gauche : « Stage de 175 h » · « Les matins en semaine · 8h–12h » · « À temps plein pendant les vacances » · « Lyon ou télétravail »
 - Droite (refait le 30/10, **façon app Calendrier d'iOS**) : carte en verre, résumé calculé (« 4 semaines à temps plein · sinon les matins (8h–12h) »), **un mois à la fois** partout, titre « Novembre 2026 » + flèches. Jours ronds : matin dispo = chiffre + point violet ; journée complète = pastille `--accent` pleine ; férié (barré), passé, week-end = grisé. Le mois **suit le doigt (ou la souris) 1:1**, résiste à l'élastique aux extrémités et se cale sur le mois voisin avec un ressort qui reprend la vitesse du lâcher (projection d'Apple) ; un glisser vertical fait défiler la page. Mois hors champ `inert`. Sans JS : tous les mois empilés.
 - Info-bulle au survol (souris seulement, « Lun. 2 nov. · journée complète »).
 - Vrai tableau accessible (`role="grid"`, libellés de jours complets pour lecteurs d'écran).
 - Légende + « Autres périodes : à définir ensemble » (exemple de calcul retiré le 30/10).
-- CTA « Me proposer un créneau → » : scroll vers Contact avec objet pré-rempli « Stage 170 h ».
+- CTA « Me proposer un créneau → » : scroll vers Contact avec objet pré-rempli « Stage 175 h ».
 - Bloc « Et après : alternance » : après le calendrier dans le HTML ; sous le calendrier sur téléphone et tablette, sous les infos (colonne de gauche) sur ordinateur (30/10).
 
 ### 10. Contact
 « Travaillons » / « ensemble » (police système 800, ~9vw, mot par mot, letter-spacing qui se resserre au scroll).
-- Gauche : formulaire Web3Forms : Nom*, Email*, Entreprise, Objet (Stage 170 h / Alternance B3 / Autre), Message*, honeypot caché. Validation native + messages en français. États : focus, erreur inline, envoi (spinner, bouton désactivé), succès « Message reçu, je te réponds vite ✓ », échec (message + mailto de secours). « Tes données servent uniquement à te répondre. » Sans JS : `action` HTTP vers Web3Forms avec redirection. Sans clé : mailto à la place du formulaire.
+- Gauche : formulaire Web3Forms : Nom*, Email*, Entreprise, Objet (Stage 175 h / Alternance B3 / Autre), Message*, honeypot caché. Validation native + messages en français. États : focus, erreur inline, envoi (spinner, bouton désactivé), succès « Message reçu, je te réponds vite ✓ », échec (message + mailto de secours). « Tes données servent uniquement à te répondre. » Sans JS : `action` HTTP vers Web3Forms avec redirection. Sans clé : mailto à la place du formulaire.
 - Droite : liens rapides (icône Solar + libellé + ↗ qui glisse) : Email (copier ; **seulement avec le formulaire** depuis le 11/11 : sans clé, l'adresse est déjà dans le bloc « Écris-moi directement » à gauche), LinkedIn, GitHub, TryHackMe, Hack The Box, Discord « tatoune » (copier), CV (désactivé « bientôt »).
 
 ### 11. Footer
@@ -541,7 +541,7 @@ object-src 'none';
 ## 13. SEO
 
 - `<title>` : « Ethan Bacquier · Étudiant en cybersécurité · Ynov Lyon » (raccourci à moins de 60 caractères après l'audit SEO)
-- `meta description` : « Étudiant en B2 cybersécurité à Ynov Lyon : je cherche un stage de 170 h en cybersécurité ou en infra dès novembre, puis une alternance en 2027. » (143 caractères) (120 à 160 caractères, sans troncature)
+- `meta description` : « Étudiant en B2 cybersécurité à Ynov Lyon : je cherche un stage de 175 h en cybersécurité ou en infra dès novembre, puis une alternance en 2027. » (143 caractères) (120 à 160 caractères, sans troncature)
 - `llms.txt`, `404.html`, `confidentialite.html` (RGPD : formulaire de contact) générés ou présents dans `public/`.
 - Open Graph + Twitter card (`og-image.jpg`), canonical, favicon « EB » (SVG + PNG 32/180), `robots.txt`, `sitemap.xml` (générés depuis `VITE_SITE_URL`).
 - JSON-LD `@graph` : `Person` (`@id` …/#person, alternateName « Tatoune », affiliation Ynov, `sameAs` GitHub, LinkedIn, TryHackMe, HTB) + `WebSite`.
